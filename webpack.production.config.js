@@ -8,10 +8,13 @@ const config = {
   devtool: 'cheap-module-source-map',
 
   entry: [
-    './main.js',
+    './main.tsx',
     './assets/scss/main.scss',
   ],
-
+  resolve: {
+    // Add '.ts' and '.tsx' as resolvable extensions.
+    extensions: ['.ts', '.tsx', '.js', '.json'],
+  },
   context: resolve(__dirname, 'src'),
 
   output: {
@@ -43,9 +46,21 @@ const config = {
   module: {
     loaders: [
       {
-        test: /\.js?$/,
-        exclude: /node_modules/,
+        test: /\.tsx?$/,
+        loader: 'awesome-typescript-loader',
+        include: resolve('src'),
+      },
+      {
+        test: /\.js$/,
         loader: 'babel-loader',
+        options: {
+          presets: [['env', {
+            targets: {
+              browsers: ['last 2 versions', 'not ie <= 11'],
+            },
+          }], ['stage-2']],
+        },
+        exclude: /node_modules/,
       },
       {
         test: /\.scss$/,
