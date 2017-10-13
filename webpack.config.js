@@ -12,8 +12,8 @@ const config = {
     'react-hot-loader/patch',
     'webpack-dev-server/client?http://localhost:8080',
     'webpack/hot/only-dev-server',
-    './main.tsx',
-    './assets/scss/main.scss',
+    './index.tsx',
+    './styles/scss/main.scss',
   ],
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
@@ -65,9 +65,8 @@ const config = {
         exclude: /node_modules/,
       },
       {
-        test: /\.scss$/,
-        exclude: /node_modules/,
-        use: ExtractTextPlugin.extract({
+        test: /\.(scss|css)$/,
+        use: ['css-hot-loader'].concat(ExtractTextPlugin.extract({
           fallback: 'style-loader',
           use: [
             'css-loader',
@@ -79,7 +78,7 @@ const config = {
             },
           ],
           publicPath: '../',
-        }),
+        })),
       },
       { test: /\.(png|jpg|gif)$/, use: 'url-loader?limit=15000&name=images/[name].[ext]' },
       { test: /\.eot(\?v=\d+.\d+.\d+)?$/, use: 'file-loader?&name=fonts/[name].[ext]' },
