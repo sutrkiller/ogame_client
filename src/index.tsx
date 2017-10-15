@@ -8,9 +8,11 @@ import {ConnectedRouter} from "react-router-redux";
 import {configureStore} from "./config/configureStore";
 import * as RoutesModule from './routes';
 import { routes} from "./routes";
-import '../node_modules/bootstrap/dist/css/bootstrap.css';
 
-const baseUrl = document.getElementsByTagName('base')[0].getAttribute('href')!;
+import 'bootstrap/dist/css/bootstrap.css';
+import 'font-awesome/scss/font-awesome.scss';
+
+const baseUrl = '/';
 const history = createBrowserHistory({ basename: baseUrl });
 const store = configureStore(history);
 

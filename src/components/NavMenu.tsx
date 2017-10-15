@@ -1,30 +1,40 @@
 import * as React from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import {NavLink, Link} from 'react-router-dom';
+import {Navbar, NavItem, NavbarBrand, NavbarToggler, Collapse, Nav} from 'reactstrap';
+import {ROUTE_HOME} from "../routes";
 
-export class NavMenu extends React.Component<{}, {}> {
-  public render() {
-    return <div className='main-nav'>
-      <div className='navbar navbar-inverse'>
-        <div className='navbar-header'>
-          <button type='button' className='navbar-toggle' data-toggle='collapse' data-target='.navbar-collapse'>
-            <span className='sr-only'>Toggle navigation</span>
-            <span className='icon-bar'/>
-            <span className='icon-bar'/>
-            <span className='icon-bar'/>
-          </button>
-          <Link className='navbar-brand' to={ '/' }>OGame</Link>
-        </div>
-        <div className='clearfix'/>
-        <div className='navbar-collapse collapse'>
-          <ul className='nav navbar-nav'>
-            <li>
-              <NavLink exact to={ '/' } activeClassName='active'>
-                <span className='glyphicon glyphicon-home'/> Home
+interface StateProps {
+  isOpen: boolean;
+}
+
+export class NavMenu extends React.Component<{}, StateProps> {
+  constructor() {
+    super();
+    this.state = {isOpen: false}
+  }
+
+  _onToggle = () => {
+    this.setState(prevState => {
+      return {isOpen: !prevState.isOpen}
+    });
+  };
+
+  render() {
+    return <div className='main-nav col-max-250'>
+      <Navbar color="dark" dark expand="md">
+        <Link className="navbar-brand" to={ROUTE_HOME}>OGame</Link>
+        <NavbarToggler onClick={this._onToggle}/>
+        <Collapse isOpen={this.state.isOpen} navbar>
+          <Nav className="ml-auto" navbar>
+            <NavItem>
+              {/*TODO: can use 'replace'*/}
+              <NavLink exact to={ROUTE_HOME} className='nav-link'>
+                <span className='fa fa-fw fa-home fa-lg'/> Home
               </NavLink>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>;
+            </NavItem>
+          </Nav>
+        </Collapse>
+      </Navbar>
+    </div>
   }
 }

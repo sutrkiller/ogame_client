@@ -1,18 +1,19 @@
 $color: #262828;
-$nav-background-color: #4189C7;
+$nav-background-color: #702579;
 $nav-color: white;
 
 body {
   color: $color;
 }
 
-/* Highlighting rules for nav menu items */
-/* Keep the nav menu independent of scrolling and on top of other items */
-/* On small screens, the nav menu spans the full width of the screen. Leave a space for it. */
-/* On small screens, convert the nav menu to a vertical sidebar */
+.container-fluid {
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .main-nav {
   li {
-    .glyphicon {
+    .fa {
       margin-right: 10px;
     }
     a.active {
@@ -28,25 +29,55 @@ body {
       }
     }
   }
+  .navbar {
+    padding-left: 0;
+    padding-right: 0;
+    .navbar-brand {
+      margin-right: 0;
+      padding-left: 16px;
+    }
+    .nav-link {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+  }
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1;
 }
+
 @media (max-width: 767px) {
   body {
-    padding-top: 50px;
+    padding-top: 56px;
+  }
+  .navbar-toggler {
+    margin-right: 16px;
   }
 }
+
 @media (min-width: 768px) {
+  .col-max-250 {
+    max-width: 250px;
+  }
+
   .main-nav {
     height: 100%;
-    width: calc(25% - 20px);
+    width: 25%;
     .navbar {
       border-radius: 0;
       border-width: 0;
       height: 100%;
+      display: block;
+
+      .navbar-collapse {
+        display: block !important;
+
+        .navbar-nav {
+          display: block;
+        }
+      }
       ul {
         float: none;
       }
@@ -55,8 +86,8 @@ body {
         font-size: 15px;
         margin: 6px;
         a {
-          padding: 10px 16px;
           border-radius: 4px;
+          padding: 10px 16px;
         }
       }
       a {
@@ -65,13 +96,14 @@ body {
         overflow: hidden;
         text-overflow: ellipsis;
       }
-    }
-    .navbar-header {
-      float: none;
-    }
-    .navbar-collapse {
-      border-top: 1px solid #444;
-      padding: 0;
+
+      .navbar-header {
+        float: none;
+      }
+      .navbar-collapse {
+        border-top: 1px solid #444;
+        padding: 0;
+      }
     }
   }
 }
