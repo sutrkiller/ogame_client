@@ -1,17 +1,55 @@
 import * as React from 'react';
 import {NavLink, Link} from 'react-router-dom';
-import {Navbar, NavItem, NavbarBrand, NavbarToggler, Collapse, Nav} from 'reactstrap';
+import {Navbar, NavItem, NavbarToggler, Collapse, Nav} from 'reactstrap';
 import {ROUTE_HOME} from "../routes";
 
-interface StateProps {
+interface NavMenuProps {
+
+}
+
+interface NavMenuState {
   isOpen: boolean;
 }
 
-export class NavMenu extends React.Component<{}, StateProps> {
-  constructor() {
-    super();
-    this.state = {isOpen: false}
+export class NavMenu extends React.PureComponent<NavMenuProps, NavMenuState> {
+  static displayName = "NavMenu";
+
+  wrapperRef: any;
+
+  constructor(props: NavMenuProps) {
+    super(props);
+    this.state = {
+      isOpen: false
+    }
   }
+
+  componentDidMount() {
+    document.addEventListener('mouseup', this._handleClickOutside);
+    document.addEventListener('touchend', this._handleClickOutside);
+    window.addEventListener('resize', this._closeMenu);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mouseup', this._handleClickOutside);
+    document.removeEventListener('touchend', this._handleClickOutside);
+    window.removeEventListener('resize', this._closeMenu);
+  }
+
+  _setWrapperRef = (node: any) => {
+    this.wrapperRef = node;
+  };
+
+  _handleClickOutside = (event: Event) => {
+    if (this.wrapperRef && !this.wrapperRef.contains(event.target)) {
+      this.setState(_ => ({isOpen: false}));
+    }
+  };
+
+  _closeMenu = () => {
+    if (this.state.isOpen) {
+      this.setState(_ => ({isOpen: false}));
+    }
+  };
 
   _onToggle = () => {
     this.setState(prevState => {
@@ -20,7 +58,7 @@ export class NavMenu extends React.Component<{}, StateProps> {
   };
 
   render() {
-    return <div className='main-nav col-max-250'>
+    return <div ref={this._setWrapperRef} className='main-nav col-max-250'>
       <Navbar color="dark" dark expand="md">
         <Link className="navbar-brand" to={ROUTE_HOME}>OGame</Link>
         <NavbarToggler onClick={this._onToggle}/>
