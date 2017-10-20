@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {NavLink, Link} from 'react-router-dom';
 import {Navbar, NavItem, NavbarToggler, Collapse, Nav} from 'reactstrap';
-import {ROUTE_HOME} from "../routes";
+import {ROUTE_HOME, ROUTE_LOGIN} from "../routes";
 
 interface NavMenuProps {
 
@@ -11,7 +11,7 @@ interface NavMenuState {
   isOpen: boolean;
 }
 
-export class NavMenu extends React.PureComponent<NavMenuProps, NavMenuState> {
+export class NavMenu extends React.Component<NavMenuProps, NavMenuState> {
   static displayName = "NavMenu";
 
   wrapperRef: any;
@@ -68,6 +68,9 @@ export class NavMenu extends React.PureComponent<NavMenuProps, NavMenuState> {
               {/*TODO: can use 'replace'*/}
               <NavLink exact to={ROUTE_HOME} className='nav-link'>
                 <span className='fa fa-fw fa-home fa-lg'/> Home
+              </NavLink>
+              <NavLink to={ROUTE_LOGIN} className='nav-link'>
+                <span className='fa fa-fw fa-user fa-lg'/> Login
               </NavLink>
             </NavItem>
           </Nav>

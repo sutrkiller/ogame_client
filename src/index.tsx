@@ -10,7 +10,6 @@ import * as RoutesModule from './routes';
 import { routes} from "./routes";
 
 import 'bootstrap/dist/css/bootstrap.css';
-import 'font-awesome/scss/font-awesome.scss';
 
 const baseUrl = '/';
 const history = createBrowserHistory({ basename: baseUrl });
