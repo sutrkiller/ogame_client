@@ -6,31 +6,31 @@ import {Provider} from 'react-redux';
 import {ConnectedRouter} from "react-router-redux";
 
 import {configureStore} from "./config/configureStore";
-import * as RoutesModule from './routes';
-import { routes} from "./routes";
+import * as LayoutModule from './components/Layout';
+import { Layout } from "./components/Layout";
 
-import 'bootstrap/dist/css/bootstrap.css';
+import '../node_modules/bootstrap/dist/css/bootstrap.css';
 
 const baseUrl = '/';
 const history = createBrowserHistory({ basename: baseUrl });
 const store = configureStore(history);
 
 
-const renderApp = (appRoutes: any) => {
+const renderApp = (app: any) => {
   render(
     <AppContainer>
       <Provider store={store}>
-        <ConnectedRouter history={history} children={appRoutes} />
+        <ConnectedRouter history={history} children={app} />
       </Provider>
     </AppContainer>,
     document.getElementById('root'),
   );
 };
 
-renderApp(routes);
+renderApp(<Layout/>);
 
 if (module.hot) {
-  module.hot.accept('./routes', () => {
-    renderApp(require<typeof RoutesModule>("./routes").routes);
+  module.hot.accept('./components/Layout', () => {
+    renderApp(require<typeof LayoutModule>("./components/Layout").Layout);
   });
 }

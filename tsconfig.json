@@ -8,12 +8,13 @@
     "strict": true,
     "noImplicitAny": true,
     "jsx": "react",
-    "allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "./src/**/*"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "typings"
   ]
 }

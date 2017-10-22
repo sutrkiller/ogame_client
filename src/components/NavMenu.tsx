@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {NavLink, Link} from 'react-router-dom';
 import {Navbar, NavItem, NavbarToggler, Collapse, Nav} from 'reactstrap';
-import {ROUTE_HOME, ROUTE_LOGIN} from "../routes";
+import {ROUTE_HOME, ROUTE_SIGN_IN} from "../config/routes";
 
 interface NavMenuProps {
 
@@ -69,8 +69,8 @@ export class NavMenu extends React.Component<NavMenuProps, NavMenuState> {
               <NavLink exact to={ROUTE_HOME} className='nav-link'>
                 <span className='fa fa-fw fa-home fa-lg'/> Home
               </NavLink>
-              <NavLink to={ROUTE_LOGIN} className='nav-link'>
-                <span className='fa fa-fw fa-user fa-lg'/> Login
+              <NavLink to={ROUTE_SIGN_IN} className='nav-link'>
+                <span className='fa fa-fw fa-user fa-lg'/> Sign in
               </NavLink>
             </NavItem>
           </Nav>

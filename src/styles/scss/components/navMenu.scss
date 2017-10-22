@@ -1,21 +1,18 @@
-$nav-background-color: #702579;
-$nav-color: white;
-
 .main-nav {
   li {
     .fa {
       margin-right: 10px;
     }
     a.active {
-      background-color: $nav-background-color;
-      color: $nav-color;
+      background-color: $nav-active-color;
+      color: $nav-text-color;
       &:hover {
-        background-color: $nav-background-color;
-        color: $nav-color;
+        background-color: $nav-active-color;
+        color: $nav-text-color;
       }
       &:focus {
-        background-color: $nav-background-color;
-        color: $nav-color;
+        background-color: $nav-active-color;
+        color: $nav-text-color;
       }
     }
   }
@@ -39,9 +36,6 @@ $nav-color: white;
 }
 
 @media (max-width: 767px) {
-  body {
-    padding-top: 56px;
-  }
   .navbar-toggler {
     margin-right: 16px;
   }

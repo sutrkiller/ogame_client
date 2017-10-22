@@ -1,16 +1,24 @@
-@import './navMenu';
 $fa-font-path: "~font-awesome/fonts";
 @import '~font-awesome/scss/font-awesome.scss';
+@import url('https://fonts.googleapis.com/css?family=Roboto');
 
-$color: #262828;
+@import "variables";
+@import 'shared/forms';
+@import 'shared/buttons';
+@import 'components/navMenu';
 
 body {
-  color: $color;
+  color: $body-text-color;
+  font-family: 'Roboto', sans-serif;
 }
 
 .container-fluid {
   padding-left: 0;
   padding-right: 0;
+}
+
+.content-main {
+  padding: 12px 12px;
 }
 
 @media (max-width: 767px) {
