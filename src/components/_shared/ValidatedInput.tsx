@@ -1,8 +1,7 @@
 import * as React from 'react';
-import * as PropTypes from 'prop-types';
 import * as classNames from 'classnames';
 
-interface ValidatedInputProps {
+interface IValidatedInputProps {
   value: string;
   name: string;
   placeholder: string;
@@ -20,30 +19,12 @@ interface ValidatedInputProps {
   onChange: (name: string, value: string, isValid: boolean) => void;
 }
 
-interface ValidatedInputState {
+interface IValidatedInputState {
   value: string;
 }
 
-class ValidatedInput extends React.PureComponent<ValidatedInputProps, ValidatedInputState> {
+class ValidatedInput extends React.PureComponent<IValidatedInputProps, IValidatedInputState> {
   static displayName = "ValidatedInput";
-  static propTypes = {
-    value: PropTypes.string,
-
-    name: PropTypes.string.isRequired,
-    placeholder: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    addOnClassName: PropTypes.string.isRequired,
-
-    isValid: PropTypes.bool,
-    errors: PropTypes.arrayOf(PropTypes.string),
-
-    hintText: PropTypes.string,
-    required: PropTypes.bool,
-    minLength: PropTypes.number,
-    maxLength: PropTypes.number,
-
-    onChange: PropTypes.func.isRequired,
-  };
 
   _input:HTMLInputElement|null = null;
 
