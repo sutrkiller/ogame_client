@@ -1,4 +1,6 @@
 import {Guid} from "./Guid";
+import {Record} from "immutable";
+import {guidGenerator} from "../utils/guidGenerator";
 
 export enum ErrorScopeEnum {
   Application = 'application',
@@ -29,8 +31,33 @@ export const getErrorScope = (name: string): ErrorScopeEnum => {
   }
 };
 
-export interface IError {
+export interface IErrorMessage {
   id: Guid;
   scope: ErrorScopeEnum;
   text: string;
+}
+
+const ErrorInitialState: IErrorMessage = {
+  id: '',
+  scope: ErrorScopeEnum.Application,
+  text: ''
+};
+
+type ErrorMessageParams = {
+  scope?: ErrorScopeEnum;
+  text?: string;
+}
+
+export class ErrorMessage extends Record(ErrorInitialState) {
+  id: Guid;
+  scope: ErrorScopeEnum;
+  text: string;
+
+  constructor(params?: ErrorMessageParams) {
+    params ? super({id: guidGenerator(), ...params}) : super({id: guidGenerator()});
+  }
+
+  with(values: ErrorMessageParams) {
+    return this.merge(values) as this;
+  }
 }

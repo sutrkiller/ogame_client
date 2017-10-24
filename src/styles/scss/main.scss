@@ -6,6 +6,7 @@ $fa-font-path: "~font-awesome/fonts";
 @import 'shared/forms';
 @import 'shared/buttons';
 @import 'components/navMenu';
+@import 'components/spinner';
 
 body {
   color: $body-text-color;

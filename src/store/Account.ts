@@ -2,12 +2,13 @@ import { Reducer } from 'redux';
 import {Guid} from "../models/Guid";
 import {AppThunkAction} from "./index";
 import {client, isSuccessStatus, parseFailedResponse} from "../utils/client";
-import {replace} from "react-router-redux";
+import {LOCATION_CHANGE, replace} from "react-router-redux";
 import * as routes from "../config/routes";
 import {AxiosResponse} from "axios";
-import {IError} from "../models/IError";
+import {ErrorMessage, ErrorScopeEnum, IErrorMessage} from "../models/IError";
 import {IAction} from '../models/IAction';
 import {accountActions} from './actionTypes'
+import {Map, OrderedMap} from "immutable";
 
 export interface IToken {
   value: Guid;
@@ -29,9 +30,9 @@ export interface IAccountState {
 
 export interface IRegisterDependencies {
   registerStart: () => IAction;
-  registerFail: (errors: IError[]) => IAction;
+  registerFail: (errors: Map<ErrorScopeEnum, OrderedMap<Guid, IErrorMessage>>) => IAction;
   registerSuccess: () => IAction;
-  parseFailedResponse: (response: AxiosResponse) => IError[];
+  parseFailedResponse: (response: AxiosResponse) => Map<ErrorScopeEnum, OrderedMap<Guid, IErrorMessage>>;
   redirect: () => IAction;
 }
 
@@ -49,7 +50,7 @@ const registerSuccess = (): IAction => {
   }
 };
 
-const registerFail = (errors:IError[]): IAction => {
+const registerFail = (errors: Map<ErrorScopeEnum, OrderedMap<Guid, IErrorMessage>>): IAction => {
   return {
     type: accountActions.REGISTER_FAIL,
     payload: {
@@ -71,7 +72,21 @@ const registerCreator = (dependencies: IRegisterDependencies) => (userName: stri
       }
     })
     .catch(failed => {
-      console.log(failed);
+      if (!failed.response) {
+        const error = new ErrorMessage({
+          text: "There was a network error when communicating with the server.",
+          scope: ErrorScopeEnum.Application,
+        });
+        const errors = Map<ErrorScopeEnum, OrderedMap<Guid, IErrorMessage>>({
+          [error.scope]: OrderedMap<Guid, IErrorMessage>({
+            [error.id]: error
+          })
+        });
+
+        dispatch(dependencies.registerFail(errors));
+        return;
+      }
+      debugger;
       throw new Error('This should not happen!');
     });
 };
@@ -112,6 +127,7 @@ export const reducer: Reducer<IAccountState> = (state: IAccountState = initialSt
 
     case accountActions.REGISTER_SUCCESS:
     case accountActions.REGISTER_FAIL:
+    case LOCATION_CHANGE:
       return {...state, isLoading: false};
 
     default:

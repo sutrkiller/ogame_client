@@ -1,7 +1,10 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
+import {IErrorMessage} from "../../models/IError";
+import {List, OrderedMap} from "immutable";
+import {Guid} from "../../models/Guid";
 
-interface IValidatedInputProps {
+interface IValidatedInputDataProps {
   value: string;
   name: string;
   placeholder: string;
@@ -9,15 +12,19 @@ interface IValidatedInputProps {
   addOnClassName: string;
 
   isValid?: boolean;
-  errors?: string[];
+  errors?: OrderedMap<Guid, IErrorMessage>;
 
   hintText?: string;
   required?: boolean;
   minLength?: number;
   maxLength?: number;
+}
 
+interface IValidatedInputDispatchProps {
   onChange: (name: string, value: string, isValid: boolean) => void;
 }
+
+type IValidatedInputProps = IValidatedInputDataProps & IValidatedInputDispatchProps;
 
 interface IValidatedInputState {
   value: string;
@@ -35,11 +42,12 @@ class ValidatedInput extends React.PureComponent<IValidatedInputProps, IValidate
   };
 
   _renderErrors = () => {
-    const errors = this.props.errors && this.props.errors.length
-      ? this.props.errors  //
-      : [this._input ? this._input.validationMessage : "Invalid input"];
+    if (this.props.errors && this.props.errors.size) {
+      return <ul className="form-input-error-list">{this.props.errors.valueSeq().toArray().map((value: IErrorMessage) => <li key={value.id}>{value.text}</li>)}</ul>
+    }
 
-    return <ul className="form-input-error-list">{errors.map(value => <li key={value}>{value}</li>)}</ul>
+    const defaultMessage = this._input ? this._input.validationMessage : "Invalid input";
+    return <ul className="form-input-error-list"><li key={"default"}>{defaultMessage}</li></ul>
   };
 
   render() {

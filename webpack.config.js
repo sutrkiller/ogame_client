@@ -30,7 +30,7 @@ const config = {
   devServer: {
     hot: true,
     contentBase: resolve(__dirname, 'build'),
-    //TODO: production should run on different server
+    // TODO: production should run on different server
     historyApiFallback: true,
     // publicPath: '/',
   },

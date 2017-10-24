@@ -2,7 +2,8 @@ import * as axios from 'axios';
 import {AxiosResponse} from "axios";
 import {Guid} from "../models/Guid";
 import {guidGenerator} from "./guidGenerator";
-import {getErrorScope, IError} from "../models/IError";
+import {ErrorMessage, ErrorScopeEnum, getErrorScope, IErrorMessage} from "../models/IError";
+import {Map, OrderedMap} from "immutable";
 
 export const client = {
   register: (userName: string, email: string, password: string, confirmPassword: string) => clientInstance.post('account/register', {
@@ -28,7 +29,7 @@ interface IParseFailedResponseDependencies {
 
 export const isSuccessStatus = (status: number) => status >= 200 && status < 300;
 
-const parseFailedResponseCreator = (dependencies: IParseFailedResponseDependencies) => (response: AxiosResponse): IError[] => {
+const parseFailedResponseCreator = (dependencies: IParseFailedResponseDependencies) => (response: AxiosResponse): Map<ErrorScopeEnum, OrderedMap<Guid, IErrorMessage>> => {
   if (!response) {
     debugger;
   }
@@ -42,15 +43,13 @@ const parseFailedResponseCreator = (dependencies: IParseFailedResponseDependenci
   throw new Error("Unknown response format");
 };
 
-const extractDataErrors = (data: object, guidGenerator: () => Guid) => {
-  return (<any>Object).entries(data).reduce((previous: IError[], [name, messages]: [string, string[]]) => [
-    ...previous,
-    ...messages.map(message => ({
-      id: guidGenerator(),
-      scope: getErrorScope(name),
-      text: message
-    }))
-  ], []);
+const extractDataErrors = (data: object, guidGenerator: () => Guid): Map<ErrorScopeEnum, OrderedMap<Guid, IErrorMessage>> => {
+  return (<any>Object).entries(data).reduce((previous: Map<ErrorScopeEnum, OrderedMap<Guid, IErrorMessage>>, [name, messages]: [string, string[]]) => {
+    return previous.set(getErrorScope(name), OrderedMap(messages.map(message => new ErrorMessage({
+      text: message,
+      scope: getErrorScope(name)
+    })).map(error => OrderedMap([error.id, error]))));
+  }, Map<ErrorScopeEnum, OrderedMap<Guid, IErrorMessage>>());
 };
 
 export const parseFailedResponse = parseFailedResponseCreator({

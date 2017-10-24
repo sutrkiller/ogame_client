@@ -1,16 +1,20 @@
 import * as React from 'react';
 import {ValidatedInput} from '../_shared/ValidatedInput';
-import {validatePassword} from '../../utils/validateInput';
+import {validateConfirmPasswordValue, validatePassword} from '../../utils/validateInput';
 import {connect} from "react-redux";
 import {actionCreators} from '../../store/Account';
-
+import MdSpinner, {default as MDSpinner} from 'react-md-spinner';
+import * as classNames from 'classnames';
 //types
 import {Dispatch} from '../../store/index'
 import {IApplicationState} from "../../store/index";
-import {ErrorScopeEnum} from "../../models/IError";
+import {ErrorMessage, ErrorScopeEnum, IErrorMessage} from "../../models/IError";
+import {Map, OrderedMap} from "immutable";
+import {Guid} from "../../models/Guid";
 
 interface IRegisterDataProps {
   isSubmitEnabled: boolean;
+  errors: Map<ErrorScopeEnum, OrderedMap<Guid, IErrorMessage>>;
 }
 
 interface IRegisterDispatchProps {
@@ -27,10 +31,12 @@ interface IRegisterState {
 interface IInputState {
   value: string;
   isValid: boolean;
-  errors: string[];
+  errors: OrderedMap<Guid, IErrorMessage>;
 }
 
 interface RegisterElementsState {
+  [key: string]: IInputState;
+
   email: IInputState;
   userName: IInputState;
   password: IInputState;
@@ -46,12 +52,32 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
     this.state = {
       hasBeenSubmitted: false,
       elements: {
-        email: {value: "", isValid: false, errors: []},
-        userName: {value: "", isValid: false, errors: []},
-        password: {value: "", isValid: false, errors: []},
-        confirmPassword: {value: "", isValid: false, errors: []},
+        email: {value: "", isValid: false, errors: OrderedMap()},
+        userName: {value: "", isValid: false, errors: OrderedMap()},
+        password: {value: "", isValid: false, errors: OrderedMap()},
+        confirmPassword: {value: "", isValid: false, errors: OrderedMap()},
       }
     }
+  }
+
+  componentWillReceiveProps(nextProps: IRegisterProps) {
+    const validNames = Object.keys(this.state.elements);
+    nextProps.errors
+      .filter((value, key) => validNames.some(n => n === key))
+      .forEach(((value: OrderedMap<Guid, IErrorMessage>, key: ErrorScopeEnum) => {
+        if (this.state.elements[key].errors !== value) {
+          this.setState(prevState => ({
+            elements: {
+              ...prevState.elements,
+              [key]: {
+                value: prevState.elements[key].value,
+                isValid: false,
+                errors: value,
+              }
+            },
+          }));
+        }
+      }));
   }
 
   _onRegister = (event: React.FormEvent<HTMLFormElement>) => {
@@ -67,28 +93,39 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
     }
   };
 
-  _onInputChange = (name: string, value: string, isValid: boolean) => {
-    let errors: string[] = [];
-    let useDefaultMessageFirst = name === 'confirmPassword';
-
-    if (isValid || useDefaultMessageFirst) {
-      switch (name) {
-        case 'password':
-          errors = validatePassword(value);
-          break;
-
-        case 'confirmPassword':
-          errors = this.state.elements.password.value === value ? [] : ["The passwords must match."];
-          break;
-      }
-    }
-    const valid = isValid && errors.length === 0;
+  _setElementState(name: string, value: IInputState) {
     this.setState(prevState => ({
       elements: {
         ...prevState.elements,
-        [name]: {value, isValid: valid, errors}
+        [name]: {...prevState.elements[name], ...value}
       }
     }))
+  }
+
+  _onInputChange = (name: string, value: string, isValid: boolean) => {
+    let errors = OrderedMap<Guid, IErrorMessage>();
+    let useCustomMessageFirst = ['confirmPassword', 'password'].some(v => v == name);
+
+    if (isValid || useCustomMessageFirst) {
+      switch (name) {
+        case 'password':
+          errors = validatePassword(value);
+          // validate confirmPasswordAsWell as they are dependant
+          const confirmedPasswordErrors = validateConfirmPasswordValue(value, this.state.elements.confirmPassword.value);
+          this._setElementState('confirmPassword', {
+            value: this.state.elements.confirmPassword.value,
+            isValid: confirmedPasswordErrors.size === 0,
+            errors: confirmedPasswordErrors
+          });
+          break;
+
+        case 'confirmPassword':
+          errors = errors.merge(validateConfirmPasswordValue(this.state.elements.password.value, value));
+          break;
+      }
+    }
+    const valid = isValid && errors.size === 0;
+    this._setElementState(name, {value, isValid: valid, errors});
   };
 
   render() {
@@ -142,7 +179,11 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
                             isValid={hasBeenSubmitted ? confirmPassword.isValid : true}
                             minLength={8} maxLength={20} required/>
 
-            <button type="submit" className="btn btn-dark btn-active">Create account</button>
+            <div>
+              <button type="submit" className="btn btn-dark btn-active">Create account <MDSpinner size={20}
+                                                                                                  className={classNames('button-spinner', {'d-none': this.props.isSubmitEnabled})}/>
+              </button>
+            </div>
           </fieldset>
         </form>
       </div>
@@ -152,7 +193,8 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
 
 const mapStateToProps = (state: IApplicationState): IRegisterDataProps => {
   return {
-    isSubmitEnabled: !state.account.isLoading
+    isSubmitEnabled: !state.account.isLoading,
+    errors: state.errorNotifications.errors, //TODO: continue with...pass it somehow to ValidatedInput
   };
 };
 
