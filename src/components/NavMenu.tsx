@@ -2,6 +2,7 @@ import * as React from 'react';
 import {NavLink, Link} from 'react-router-dom';
 import {Navbar, NavItem, NavbarToggler, Collapse, Nav} from 'reactstrap';
 import {ROUTE_HOME, ROUTE_SIGN_IN} from "../config/routes";
+import {SyntheticEvent} from "react";
 
 interface NavMenuProps {
 
@@ -40,9 +41,10 @@ export class NavMenu extends React.Component<NavMenuProps, NavMenuState> {
   };
 
   _handleClickOutside = (event: Event) => {
-    if (this.wrapperRef && !this.wrapperRef.contains(event.target)) {
+    //to close it when clicked outside the menu
+    if (this.state.isOpen && this.wrapperRef && !this.wrapperRef.contains(event.target)) {
       this.setState(_ => ({isOpen: false}));
-    }
+   }
   };
 
   _closeMenu = () => {
@@ -62,13 +64,15 @@ export class NavMenu extends React.Component<NavMenuProps, NavMenuState> {
       <Navbar color="dark" dark expand="md">
         <Link className="navbar-brand" to={ROUTE_HOME}>OGame</Link>
         <NavbarToggler onClick={this._onToggle}/>
-        <Collapse isOpen={this.state.isOpen} navbar>
+        <Collapse isOpen={this.state.isOpen} navbar onClick={this._closeMenu}>
           <Nav className="ml-auto" navbar>
             <NavItem>
               {/*TODO: can use 'replace'*/}
               <NavLink exact to={ROUTE_HOME} className='nav-link'>
                 <span className='fa fa-fw fa-home fa-lg'/> Home
               </NavLink>
+            </NavItem>
+            <NavItem>
               <NavLink to={ROUTE_SIGN_IN} className='nav-link'>
                 <span className='fa fa-fw fa-user fa-lg'/> Sign in
               </NavLink>

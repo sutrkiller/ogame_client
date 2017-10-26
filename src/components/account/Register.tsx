@@ -194,7 +194,7 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
 const mapStateToProps = (state: IApplicationState): IRegisterDataProps => {
   return {
     isSubmitEnabled: !state.account.isLoading,
-    errors: state.errorNotifications.errors, //TODO: continue with...pass it somehow to ValidatedInput
+    errors: state.errorNotifications.errors,
   };
 };
 
@@ -207,3 +207,4 @@ const mapDispatchToProps = (dispatch: Dispatch): IRegisterDispatchProps => {
 const registerContainer = connect<IRegisterDataProps, IRegisterDispatchProps>(mapStateToProps, mapDispatchToProps)(Register);
 
 export {registerContainer as Register};
+// TODO: add notifications for 'application'
