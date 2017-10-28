@@ -1,32 +1,110 @@
 import * as React from 'react';
-import {NavMenu} from './NavMenu';
+import {NavMenu} from './navigation/NavMenu';
 import {ForgotPassword} from "./account/ForgotPassword";
 import {ROUTE_FORGOT_PASSWORD, ROUTE_HOME, ROUTE_REGISTER, ROUTE_SIGN_IN} from "../config/routes";
-import {Route, Switch} from "react-router-dom";
+import {NavLink, Route, Switch} from "react-router-dom";
 import {Home} from "./Home";
 import {SignIn} from "./account/Sign-in";
 import {Register} from "./account/Register";
+import * as classNames from 'classnames';
+import {NavToggler} from "./navigation/NavToggler";
+import {RouteComponentProps, withRouter} from "react-router";
 
-export class Layout extends React.Component<{}, {}> {
+interface ILayoutDataProps {
+}
+
+interface ILayoutDispatchProps {
+}
+
+type ILayoutProps = ILayoutDataProps & ILayoutDispatchProps;
+type ILayoutRoutedProps = RouteComponentProps<ILayoutProps>
+
+interface ILayoutState {
+  isOpen: boolean;
+}
+
+class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
   static displayName = "Layout";
+
+  navMenuRef: any;
+  navTogglerRef: any;
+
+  constructor(props: ILayoutRoutedProps) {
+    super(props);
+
+    this.state = {
+      isOpen: false
+    }
+  }
+
+  componentDidMount() {
+    document.addEventListener('mouseup', this._handleClickOutside);
+    document.addEventListener('touchend', this._handleClickOutside);
+    //window.addEventListener('resize', this.props.onCloseMenu);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mouseup', this._handleClickOutside);
+    document.removeEventListener('touchend', this._handleClickOutside);
+    //window.removeEventListener('resize', this.props.onCloseMenu);
+  }
+
+  _onToggleMenu = () => {
+    this.setState(prevState => {
+      return {isOpen: !prevState.isOpen}
+    });
+  };
+
+  _onCloseMenu = () => {
+    this.setState(prevState => ({isOpen: false}));
+  };
+
+  _handleClickOutside = (event: Event) => {
+    //to close it when clicked outside the menu
+    if (this.state.isOpen && (this.navMenuRef && !this.navMenuRef.contains(event.target)) && (this.navTogglerRef && !this.navTogglerRef.contains(event.target))) {
+      this._onCloseMenu();
+    }
+  };
+
+  _onNavigation = (event:any) => {
+    if (this.props.location.pathname === event.currentTarget.pathname) {
+      event.preventDefault();
+    }
+    this._onCloseMenu();
+  };
 
   render() {
     return <div className='container-fluid'>
-      <div className='row no-gutters'>
-        <div className='col-xs-0 col-md-3 col-max-250'>
-          <NavMenu/>
+      <header className="main-header">
+        <NavToggler isOpen={this.state.isOpen} onToggle={this._onToggleMenu} setInnerRef={element => this.navTogglerRef = element}/>
+        <div className="header-part-right">
+          <strong>
+            <NavLink to={ROUTE_SIGN_IN} className='nav-link' onClick={this._onNavigation}>
+              <span className='fa fa-fw fa-user fa-lg'/> <span className="nav-link-account">Register / sign in</span>
+            </NavLink>
+          </strong>
         </div>
-        <div className='col'>
-          <div className="content-main">
-            <Switch>
-              <Route exact path={ROUTE_HOME} component={Home}/>
-              <Route path={ROUTE_SIGN_IN} component={SignIn}/>
-              <Route path={ROUTE_REGISTER} component={Register}/>
-              <Route path={ROUTE_FORGOT_PASSWORD} component={ForgotPassword}/>
-            </Switch>
-          </div>
+        <div className="header-title">
+          <h1>
+            <NavLink exact to={ROUTE_HOME} onClick={this._onNavigation}>Title</NavLink>
+          </h1>
         </div>
-      </div>
+      </header>
+      <NavMenu setInnerRef={el => this.navMenuRef = el}
+               isOpen={this.state.isOpen}
+               onNavigation={this._onNavigation}/>
+      <section className={classNames("content-main", {"nav-open": this.state.isOpen})}>
+        <Switch>
+          <Route exact path={ROUTE_HOME} component={Home}/>
+          <Route path={ROUTE_SIGN_IN} component={SignIn}/>
+          <Route path={ROUTE_REGISTER} component={Register}/>
+          <Route path={ROUTE_FORGOT_PASSWORD} component={ForgotPassword}/>
+        </Switch>
+      </section>
     </div>;
   }
 }
+
+const LayoutRouted = withRouter<ILayoutProps>(Layout);
+
+export {LayoutRouted as Layout}

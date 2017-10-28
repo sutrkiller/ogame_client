@@ -1,0 +1,57 @@
+$tt-width: 250px;
+$tt-triangle-height: 10px;
+$tt-v-offset-start: 12px;
+$tt-v-offset-end: 5px;
+$tt-bg-color: rgba(0, 0, 0, 0.5);
+$tt-anim-duration: 400ms;
+$tt-anim-delay: 200ms;
+
+.tooltip {
+  position: relative;
+  box-sizing: border-box;
+
+  &:after, &:before {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    left: 50%;
+    box-sizing: border-box;
+  }
+  &:after {
+    content: attr(data-tooltip);
+    background: $tt-bg-color;
+    left: 100%;
+    margin-left: $tt-triangle-height + $tt-v-offset-start;
+    padding: 10px;
+    color: white;
+    line-height: 1.5;
+    width: $tt-width;
+    height: 60px;
+    margin-top: -22px;
+    border-radius: 0;
+  }
+
+  &:before {
+    content: "";
+    left: 100%;
+    margin-left: $tt-v-offset-start;
+    margin-top: ($tt-triangle-height / -2);
+    border-top: $tt-triangle-height solid transparent;
+    border-bottom: $tt-triangle-height solid transparent;
+    border-right: $tt-triangle-height solid $tt-bg-color;
+  }
+
+  &:hover {
+    &:after, &:before {
+      transition: all $tt-anim-duration ease $tt-anim-delay;
+      visibility: visible;
+      opacity: 1;
+    }
+    &:after {
+      margin-left: $tt-v-offset-end + $tt-triangle-height;
+    }
+    &:before {
+      margin-left: $tt-v-offset-end;
+    }
+  }
+}

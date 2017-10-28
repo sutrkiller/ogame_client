@@ -5,31 +5,222 @@ $fa-font-path: "~font-awesome/fonts";
 @import "variables";
 @import 'shared/forms';
 @import 'shared/buttons';
+@import 'shared/tooltip';
 @import 'components/navMenu';
 @import 'components/spinner';
+
+html {
+}
 
 body {
   color: $body-text-color;
   font-family: 'Roboto', sans-serif;
+  height: 100vh;
+}
+
+#root {
+  height: 100vh;
 }
 
 .container-fluid {
-  padding-left: 0;
-  padding-right: 0;
+  padding: 71px 0 0 0;
+  width: 100%;
+  height: 100%;
 }
 
-.content-main {
-  padding: 12px 12px;
-}
+.main-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 71px;
+  width: 100%;
+  line-height: 71px;
+  display: flex;
+  font-size: 0.825em;
+  z-index: 1;
+  border-bottom: 1px solid #e6eaea;
 
-@media (max-width: 767px) {
-  body {
-    padding-top: 56px;
+  .header-part-right {
+    display: flex;
+    justify-content: flex-end;
+    flex: 1;
+
+    .nav-link {
+      color: #202121;
+      padding: 0 24px;
+      border-left: 1px solid #e6eaea;
+      transition: color 0.55s ease-in-out;
+
+      &:hover {
+        color: #64686a;
+      }
+    }
+    .nav-link-account {
+      font-weight: 600;
+      text-transform: uppercase;
+      text-align: right;
+      text-decoration: none;
+    }
+  }
+
+  .header-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 71px;
+    text-align: center;
+
+    h1 {
+      margin: 0;
+      height: 100%;
+      line-height: 71px;
+
+      a {
+        color: black;
+        text-decoration: none;
+        font-size: 2.1rem;
+        font-weight: bold;
+        transition: font-size 0.4s ease-in-out;
+      }
+
+      a:hover {
+        font-size: 2.3rem;
+      }
+    }
   }
 }
 
-@media (min-width: 768px) {
-  .col-max-250 {
-    max-width: 250px;
+.nav-toggler {
+  padding-right: 24px;
+  padding-left: 24px;
+  border-right: 1px solid #e6eaea;
+  cursor: pointer;
+  z-index: 2;
+  width: 73px;
+  transition: width 0.5s ease-in-out, border-color 0.3s ease-in-out;
+
+  overflow: hidden;
+  white-space: nowrap;
+
+  .nav-toggler-text {
+    color: black;
+    display: none;
+    text-overflow: clip;
+    transition: color 0.55s ease-in-out
+  }
+
+  &-open {
+    width: 320px;
+
+    .nav-icon {
+      margin-right: 18px;
+    }
+
+    .nav-toggler-text {
+      display: inline;
+    }
+  }
+
+  &:hover {
+    .nav-icon .nav-icon-bar {
+      border-top-color: #64686a;
+    }
+    .nav-toggler-text {
+      color: #64686a;
+    }
+  }
+
+  .nav-icon {
+    width: 24px;
+    height: 20px;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    top: 1px;
+
+    .nav-icon-bar {
+      backface-visibility: hidden;
+      position: absolute;
+      left: 0;
+      border-top: 3px solid black;
+      width: 100%;
+      transition: 0.55s;
+    }
+
+    .nav-bar-top {
+      top: 0;
+
+      &-open {
+        backface-visibility: hidden;
+        top: 6px;
+        left: 2px;
+        width: 18px;
+        transform: rotate(50deg);
+        transition: 0.55s 0.25s;
+      }
+    }
+
+    .nav-bar-middle {
+      top: 6px;
+      transition: 0.25s;
+      &-open {
+        opacity: 0;
+      }
+    }
+
+    .nav-bar-bottom {
+      top: 12px;
+
+      &-open {
+        backface-visibility: hidden;
+        top: 6px;
+        left: 2px;
+        width: 18px;
+        transform: rotate(-410deg);
+        transition: 0.55s 0.25s;
+      }
+    }
+  }
+}
+
+.content-main {
+  &:before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    z-index: auto;
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.5s ease-in-out;
+  }
+
+  &.nav-open {
+    transform: translateX(320px);
+    position: fixed;
+
+    &:before {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  position: fixed;
+  transition: transform 0.5s ease-in-out;
+  height: 100%;
+  width: 100%;
+}
+
+@media (max-width: 767px) {
+  .main-header {
+    .header-part-right {
+      .nav-link {
+        display: none;
+      }
+    }
   }
 }
