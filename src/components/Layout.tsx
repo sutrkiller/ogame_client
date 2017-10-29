@@ -9,6 +9,7 @@ import {Register} from "./account/Register";
 import * as classNames from 'classnames';
 import {NavToggler} from "./navigation/NavToggler";
 import {RouteComponentProps, withRouter} from "react-router";
+import {Head} from "./Head";
 
 interface ILayoutDataProps {
 }
@@ -75,6 +76,7 @@ class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
 
   render() {
     return <div className='container-fluid'>
+      <Head />
       <header className="main-header">
         <NavToggler isOpen={this.state.isOpen} onToggle={this._onToggleMenu} setInnerRef={element => this.navTogglerRef = element}/>
         <div className="header-part-right">
@@ -84,7 +86,7 @@ class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
             </NavLink>
           </strong>
         </div>
-        <div className="header-title">
+        <div className={classNames("header-title", {"nav-open": this.state.isOpen})}>
           <h1>
             <NavLink exact to={ROUTE_HOME} onClick={this._onNavigation}>Title</NavLink>
           </h1>
@@ -108,3 +110,5 @@ class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
 const LayoutRouted = withRouter<ILayoutProps>(Layout);
 
 export {LayoutRouted as Layout}
+
+//TODO: extract variables from scss files...

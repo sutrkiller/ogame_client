@@ -2,22 +2,22 @@
   display: flex;
   flex-direction: column;
   position: absolute;
-  top: 70px;
+  top: $header-height;
   left: 0;
   bottom: 0;
-  width: 320px;
-  border-right: 1px solid #e6eaea;
+  width: $menu-open-width;
+  border-right: $border-default-width solid $border-default-color;
   transition: transform 0.5s ease-in-out, width 0.5s ease-in-out;
-  background: #f4f7f6;
+  background: $menu-background-color;
 
   .navbar-nav {
     margin: 0;
 
     .nav-item {
-      border-bottom: 1px solid #e6eaea;
+      border-bottom: $border-default-width solid $border-default-color;
 
       a {
-        color: #000;
+        color: $text-default-color;
         width: 100%;
         height: 100%;
         padding: 18px 20px;
@@ -28,11 +28,11 @@
         overflow: hidden;
 
         &.active {
-          color: $accent-color;
+          color: $menu-active-color;
         }
 
         &:hover {
-          background: white;
+          background: $menu-hover-background-color;
         }
 
         .fa {
@@ -49,7 +49,7 @@
   }
 
   &-collapsed {
-    width: 73px;
+    width: $toggler-closed-width;
 
     .nav-link-text {
       display: none;
@@ -66,16 +66,16 @@
 
 
 
-@media (max-width: 767px) {
+@media (max-width: $device-small-width) {
   .nav-main {
     &-collapsed {
-      transform: translateX(-320px);
+      transform: translateX(-$menu-open-width);
     }
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: ($device-small-width + 1px)) {
   .content-main {
-    transform: translateX(73px);
+    transform: translateX($toggler-closed-width);
   }
 }

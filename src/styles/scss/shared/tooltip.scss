@@ -1,3 +1,5 @@
+@import '~rc-tooltip/assets/bootstrap_white.css';
+
 .nav-tooltip-overlay {
   &-hidden {
     display: none;
@@ -6,7 +8,7 @@
   .rc-tooltip-inner {
     border-radius: 4px;
     span {
-      font-size: 0.9rem;
+      font-size: 0.825rem;
       font-weight: bold;
     }
   }

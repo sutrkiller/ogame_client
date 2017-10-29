@@ -1,7 +1,6 @@
 $fa-font-path: "~font-awesome/fonts";
 @import '~font-awesome/scss/font-awesome.scss';
 @import url('https://fonts.googleapis.com/css?family=Roboto');
-@import '~rc-tooltip/assets/bootstrap_white.css';
 
 @import "variables";
 @import 'shared/forms';
@@ -14,7 +13,7 @@ html {
 }
 
 body {
-  color: $body-text-color;
+  color: $text-default-color;
   font-family: 'Roboto', sans-serif;
   height: 100vh;
 }
@@ -24,7 +23,7 @@ body {
 }
 
 .container-fluid {
-  padding: 71px 0 0 0;
+  padding: $header-height 0 0 0;
   width: 100%;
   height: 100%;
 }
@@ -33,13 +32,13 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  height: 71px;
+  height: $header-height;
   width: 100%;
-  line-height: 71px;
+  line-height: $header-height;
   display: flex;
   font-size: 0.825em;
   z-index: 1;
-  border-bottom: 1px solid #e6eaea;
+  border-bottom: $border-default-width solid $border-default-color;
 
   .header-part-right {
     display: flex;
@@ -47,13 +46,13 @@ body {
     flex: 1;
 
     .nav-link {
-      color: #202121;
+      color: $text-default-color;
       padding: 0 24px;
-      border-left: 1px solid #e6eaea;
+      border-left: $border-default-width solid $border-default-color;
       transition: color 0.55s ease-in-out;
 
       &:hover {
-        color: #64686a;
+        color: $text-hover-color;
       }
     }
     .nav-link-account {
@@ -68,16 +67,16 @@ body {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    height: 71px;
+    height: $header-height;
     text-align: center;
 
     h1 {
       margin: 0;
       height: 100%;
-      line-height: 71px;
+      line-height: $header-height;
 
       a {
-        color: black;
+        color: $text-default-color;
         text-decoration: none;
         font-size: 2.1rem;
         font-weight: bold;
@@ -94,24 +93,24 @@ body {
 .nav-toggler {
   padding-right: 24px;
   padding-left: 24px;
-  border-right: 1px solid #e6eaea;
+  border-right: $border-default-width solid $border-default-color;
   cursor: pointer;
   z-index: 2;
-  width: 73px;
+  width: $toggler-closed-width;
   transition: width 0.5s ease-in-out, border-color 0.3s ease-in-out;
 
   overflow: hidden;
   white-space: nowrap;
 
   .nav-toggler-text {
-    color: black;
+    color: $text-default-color;
     display: none;
     text-overflow: clip;
     transition: color 0.55s ease-in-out
   }
 
   &-open {
-    width: 320px;
+    width: $menu-open-width;
 
     .nav-icon {
       margin-right: 18px;
@@ -124,10 +123,10 @@ body {
 
   &:hover {
     .nav-icon .nav-icon-bar {
-      border-top-color: #64686a;
+      border-top-color: $text-hover-color;
     }
     .nav-toggler-text {
-      color: #64686a;
+      color: $text-hover-color;
     }
   }
 
@@ -143,7 +142,7 @@ body {
       backface-visibility: hidden;
       position: absolute;
       left: 0;
-      border-top: 3px solid black;
+      border-top: 3px solid $text-default-color;
       width: 100%;
       transition: 0.55s;
     }
@@ -153,7 +152,7 @@ body {
 
       &-open {
         backface-visibility: hidden;
-        top: 6px;
+        top: $nav-icon-bar-distance;
         left: 2px;
         width: 18px;
         transform: rotate(50deg);
@@ -162,7 +161,7 @@ body {
     }
 
     .nav-bar-middle {
-      top: 6px;
+      top: $nav-icon-bar-distance;
       transition: 0.25s;
       &-open {
         opacity: 0;
@@ -170,14 +169,14 @@ body {
     }
 
     .nav-bar-bottom {
-      top: 12px;
+      top: ($nav-icon-bar-distance * 2);
 
       &-open {
         backface-visibility: hidden;
-        top: 6px;
+        top: $nav-icon-bar-distance;
         left: 2px;
         width: 18px;
-        transform: rotate(-410deg);
+        transform: rotate(-230deg);
         transition: 0.55s 0.25s;
       }
     }
@@ -193,7 +192,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.75);
+    background-color: $modal-background-color;
     z-index: auto;
     visibility: hidden;
     opacity: 0;
@@ -216,12 +215,20 @@ body {
   width: 100%;
 }
 
-@media (max-width: 767px) {
+@media (max-width: $device-small-width) {
   .main-header {
     .header-part-right {
       .nav-link {
         display: none;
       }
+    }
+    .header-title {
+      transition: transform 0.5s ease-in-out;
+
+      &.nav-open {
+        transform: translateX($menu-open-width);
+      }
+
     }
   }
 }

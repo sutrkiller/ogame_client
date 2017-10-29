@@ -1,11 +1,32 @@
+
+
+
+
+$text-default-color: #202121;
+$text-hover-color: #64686a;
+$header-height: 71px;
+$border-default-color: #e6eaea;
+$border-default-width: 1px;
+$toggler-closed-width: 73px;
+$menu-open-width: 320px;
+$menu-background-color: #f4f7f6;
+$menu-hover-background-color: white;
+$menu-active-color: #65216d;
+$nav-icon-bar-distance: 6px;
+$modal-background-color: rgba(0, 0, 0, 0.70);
+
+$device-small-width: 767px;
+
+
+
+
+
+$form-border-color: #f7f7f9;
+$form-invalid-color: #dc3545;
+
 $primary-color: #343a40;
 $accent-color: #65216d;
 
 $nav-active-color: $accent-color;
 $nav-text-color: white;
 $nav-background-color: $primary-color;
-
-$body-text-color: #262828;
-
-$form-border-color: #f7f7f9;
-$form-invalid-color: #dc3545;
