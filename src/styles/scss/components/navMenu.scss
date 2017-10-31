@@ -64,18 +64,10 @@
   }
 }
 
-
-
 @media (max-width: $device-small-width) {
   .nav-main {
     &-collapsed {
       transform: translateX(-$menu-open-width);
     }
-  }
-}
-
-@media (min-width: ($device-small-width + 1px)) {
-  .content-main {
-    transform: translateX($toggler-closed-width);
   }
 }

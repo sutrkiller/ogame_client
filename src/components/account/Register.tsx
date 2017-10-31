@@ -134,7 +134,19 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
 
     return (
       <div>
-        <h2>Create new account</h2>
+        <button onClick={() => {
+          this.setState(prev => ({
+            ...prev,
+            elements: {
+              email: {...prev.elements.email, value: "tobias.kamenicky@gmail.com", isValid: true},
+              userName: {...prev.elements.userName, value: "username", isValid: true},
+              password: {...prev.elements.password, value: "Password1", isValid: true},
+              confirmPassword: {...prev.elements.confirmPassword, value: "Password1", isValid: true},
+            }
+          }))
+        }}>Cheat </button>
+
+
         <form onSubmit={this._onRegister} className="form-bordered" noValidate>
           <fieldset disabled={!this.props.isSubmitEnabled}>
             <ValidatedInput name="email"
@@ -180,8 +192,16 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
                             minLength={8} maxLength={20} required/>
 
             <div>
-              <button type="submit" className="btn btn-dark btn-active">Create account <MDSpinner size={20}
-                                                                                                  className={classNames('button-spinner', {'d-none': this.props.isSubmitEnabled})}/>
+              <button type="submit" className="button confirm">
+                <div className='button-content'>
+                  <span>Create account</span>
+                </div>
+                <div className="button-icon confirm">
+                  {this.props.isSubmitEnabled
+                    ? <span className="fa fa-fw fa-chevron-right fa-lg"/>
+                    : <MDSpinner size={20} className={classNames('button-spinner', {'d-none': false})}/>
+                  }
+                </div>
               </button>
             </div>
           </fieldset>
@@ -194,7 +214,7 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
 const mapStateToProps = (state: IApplicationState): IRegisterDataProps => {
   return {
     isSubmitEnabled: !state.account.isLoading,
-    errors: state.errorNotifications.errors,
+    errors: state.notifications.validationErrors,
   };
 };
 

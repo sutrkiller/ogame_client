@@ -1,9 +1,7 @@
 .form-bordered {
   padding: 1.5rem;
-  margin: 1.5rem -15px;
+  margin: 0;
   position: relative;
-  border: solid $form-border-color;
-  border-width: .2rem 0;
 }
 
 .form-invalid-feedback {
@@ -18,8 +16,6 @@ ul, .form-input-error-list {
 
 @media (min-width: 768px) {
   .form-bordered {
-    padding: 1.5rem;
-    border-width: .2rem;
     margin-right: 0;
     margin-bottom: 0;
     margin-left: 0;

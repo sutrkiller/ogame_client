@@ -1,15 +1,15 @@
 import * as Account from "./Account";
-import * as ErrorNotifications from "./ErrorNotifications";
+import * as Notifications from "./Notifications";
 import {Dispatch} from "react-redux";
 
 export interface IApplicationState {
   account: Account.IAccountState;
-  errorNotifications: ErrorNotifications.IErrorNotificationsState;
+  notifications: Notifications.INotificationsState;
 }
 
 export const reducers = {
   account: Account.reducer,
-  errorNotifications: ErrorNotifications.reducer,
+  notifications: Notifications.reducer,
 };
 
 export interface AppThunkAction<TAction> {

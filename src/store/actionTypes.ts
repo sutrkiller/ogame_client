@@ -3,3 +3,7 @@ export const accountActions = {
   REGISTER_SUCCESS: 'REGISTER_SUCCESS',
   REGISTER_FAIL: 'REGISTER_FAIL',
 };
+
+export const notificationActions = {
+  NOTIFICATION_REMOVE: 'NOTIFICATION_REMOVE',
+};

@@ -10,6 +10,7 @@ import * as classNames from 'classnames';
 import {NavToggler} from "./navigation/NavToggler";
 import {RouteComponentProps, withRouter} from "react-router";
 import {Head} from "./Head";
+import {NotificationContainer} from "./_shared/notifications/NotificationContainer";
 
 interface ILayoutDataProps {
 }
@@ -21,7 +22,7 @@ type ILayoutProps = ILayoutDataProps & ILayoutDispatchProps;
 type ILayoutRoutedProps = RouteComponentProps<ILayoutProps>
 
 interface ILayoutState {
-  isOpen: boolean;
+  isMenuOpen: boolean;
 }
 
 class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
@@ -34,7 +35,7 @@ class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
     super(props);
 
     this.state = {
-      isOpen: false
+      isMenuOpen: false
     }
   }
 
@@ -52,17 +53,17 @@ class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
 
   _onToggleMenu = () => {
     this.setState(prevState => {
-      return {isOpen: !prevState.isOpen}
+      return {isMenuOpen: !prevState.isMenuOpen}
     });
   };
 
   _onCloseMenu = () => {
-    this.setState(prevState => ({isOpen: false}));
+    this.setState(prevState => ({isMenuOpen: false}));
   };
 
   _handleClickOutside = (event: Event) => {
     //to close it when clicked outside the menu
-    if (this.state.isOpen && (this.navMenuRef && !this.navMenuRef.contains(event.target)) && (this.navTogglerRef && !this.navTogglerRef.contains(event.target))) {
+    if (this.state.isMenuOpen && (this.navMenuRef && !this.navMenuRef.contains(event.target)) && (this.navTogglerRef && !this.navTogglerRef.contains(event.target))) {
       this._onCloseMenu();
     }
   };
@@ -78,7 +79,7 @@ class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
     return <div className='container-fluid'>
       <Head />
       <header className="main-header">
-        <NavToggler isOpen={this.state.isOpen} onToggle={this._onToggleMenu} setInnerRef={element => this.navTogglerRef = element}/>
+        <NavToggler isOpen={this.state.isMenuOpen} onToggle={this._onToggleMenu} setInnerRef={element => this.navTogglerRef = element}/>
         <div className="header-part-right">
           <strong>
             <NavLink to={ROUTE_SIGN_IN} className='nav-link' onClick={this._onNavigation}>
@@ -86,16 +87,20 @@ class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
             </NavLink>
           </strong>
         </div>
-        <div className={classNames("header-title", {"nav-open": this.state.isOpen})}>
+        <div className={classNames("header-title", {"nav-open": this.state.isMenuOpen})}>
           <h1>
             <NavLink exact to={ROUTE_HOME} onClick={this._onNavigation}>Title</NavLink>
           </h1>
         </div>
       </header>
+
+      <NotificationContainer />
+
       <NavMenu setInnerRef={el => this.navMenuRef = el}
-               isOpen={this.state.isOpen}
+               isOpen={this.state.isMenuOpen}
                onNavigation={this._onNavigation}/>
-      <section className={classNames("content-main", {"nav-open": this.state.isOpen})}>
+
+      <section className={classNames("content-main", {"nav-open": this.state.isMenuOpen})}>
         <Switch>
           <Route exact path={ROUTE_HOME} component={Home}/>
           <Route path={ROUTE_SIGN_IN} component={SignIn}/>
@@ -110,5 +115,3 @@ class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
 const LayoutRouted = withRouter<ILayoutProps>(Layout);
 
 export {LayoutRouted as Layout}
-
-//TODO: extract variables from scss files...

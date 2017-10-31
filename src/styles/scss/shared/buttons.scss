@@ -1,4 +1,62 @@
-.btn-active {
-  margin-top: 8px;
+.button {
   cursor: pointer;
+  margin-top: 8px;
+  display: inline-block;
+  //font-family: "Montserrat", "Trebuchet MS", Helvetica, sans-serif;
+  position: relative;
+  padding: .4em 3em .4em 1em;
+  background-color: #009ED8;
+  border: none;
+  color: white;
+  transition: .2s;
+
+    .button-content {
+      display: inline-block;
+      margin-right: 0.8em;
+    }
+    .button-icon {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      display: inline-block;
+      width: 2.8em;
+
+      padding-top: inherit;
+      padding-bottom: inherit;
+      background: rgba(0,0,0,0.1);
+      transition: .2s;
+    }
+
+  &:hover {
+    background: darken(#009ED8, 10%);
+    .button-icon:hover {
+      background: darken(#009ED8, 12%);
+    }
+  }
+  &:active, &:focus {
+    background: darken(#009ED8, 30%);
+    outline: none;
+  }
+
+  min-width: 10em;
+}
+
+.confirm {
+  background-color: #139675;
+
+  &:hover {
+    background: darken(#139675, 10%);
+    .button-icon:hover {
+      background: darken(#139675, 12%);
+    }
+  }
+  &:active, &:focus {
+    background: darken(#139675, 10%);
+  }
+}
+
+@keyframes bounceright {
+  from { -webkit-transform: translateX(0); }
+  to   { -webkit-transform: translateX(3px); }
 }
