@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {IApplicationState, Dispatch} from "../../../store/index";
 import {connect} from "react-redux";
-import {INotificationMessage} from "../../../models/INotification";
+import {INotificationMessage, NotificationTypeEnum} from "../../../models/INotification";
 import {Guid} from "../../../models/Guid";
 import {actionCreators} from "../../../store/Notifications";
 import * as classNames from 'classnames';
@@ -30,11 +30,13 @@ class NotificationMessage extends React.PureComponent<INotificationMessageProps,
 
   _timer: Timer;
   _text: string;
+  _type: NotificationTypeEnum;
 
   constructor(props: INotificationMessageProps) {
     super(props);
 
     this._text = props.notification.text;
+    this._type = props.notification.type;
   }
 
   componentDidMount() {
@@ -60,7 +62,7 @@ class NotificationMessage extends React.PureComponent<INotificationMessageProps,
 
   render() {
     return (
-      <div className={classNames("notification-message", `notification-${this.props.notification.type}`)} role="alert" onClick={this._onClick}>
+      <div className={classNames("notification-message", `notification-${this.props.notification ? this.props.notification.type : this._type}`)} role="alert" onClick={this._onClick}>
         <span className="fa fa-lg fa-exclamation-circle"/>
         <span>{this.props.notification ? this.props.notification.text : this._text}</span>
       </div>

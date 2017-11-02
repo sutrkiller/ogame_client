@@ -6,4 +6,5 @@ export const accountActions = {
 
 export const notificationActions = {
   NOTIFICATION_REMOVE: 'NOTIFICATION_REMOVE',
+  NOTIFICATION_CREATE: 'NOTIFICATION_CREATE',
 };

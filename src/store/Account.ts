@@ -9,6 +9,8 @@ import {ErrorMessage, ErrorScopeEnum, IErrorMessage} from "../models/IError";
 import {IAction} from '../models/IAction';
 import {accountActions} from './actionTypes'
 import {Map, OrderedMap} from "immutable";
+import {NotificationTypeEnum} from "../models/INotification";
+import {actionCreators as notificationActionCreators} from './Notifications';
 
 export interface IToken {
   value: Guid;
@@ -32,6 +34,7 @@ export interface IRegisterDependencies {
   registerStart: () => IAction;
   registerFail: (errors: Map<ErrorScopeEnum, OrderedMap<Guid, IErrorMessage>>) => IAction;
   registerSuccess: () => IAction;
+  createNotification: (type: NotificationTypeEnum, text: string, timeout: number, origin: string) => IAction;
   parseFailedResponse: (response: AxiosResponse) => Map<ErrorScopeEnum, OrderedMap<Guid, IErrorMessage>>;
   redirect: () => IAction;
 }
@@ -65,6 +68,7 @@ const registerCreator = (dependencies: IRegisterDependencies) => (userName: stri
     .then(response => {
       if (isSuccessStatus(response.status)) {
         dispatch(dependencies.registerSuccess());
+        dispatch(dependencies.createNotification(NotificationTypeEnum.Success, `Account created. Please confirm your account by following instructions in an email we sent to an address ${email}.`, 60000, 'registerAccount'));
         dispatch(dependencies.redirect());
       } else {
         const errors = dependencies.parseFailedResponse(response);
@@ -98,6 +102,7 @@ export const actionCreators = {
     registerStart,
     registerSuccess,
     registerFail,
+    createNotification: notificationActionCreators.notificationCreate,
     parseFailedResponse,
     redirect: () => replace(routes.ROUTE_SIGN_IN),
   })

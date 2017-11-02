@@ -27,6 +27,14 @@ export const actionCreators = {
         id
       }
     }
+  },
+  notificationCreate: (type: NotificationTypeEnum, text: string, timeout: number = 0, origin: string = "server"): IAction => {
+    return {
+      type: notificationActions.NOTIFICATION_CREATE,
+      payload: {
+        notification: new NotificationMessage({type, text, timeout, origin})
+      }
+    };
   }
 };
 
@@ -40,7 +48,7 @@ export const reducer: Reducer<INotificationsState> = (state: INotificationsState
         alerts: state.alerts.merge(
           action.payload.errors.get(ErrorScopeEnum.Application).toArray().map((value: IErrorMessage) => ([
             value.id, new NotificationMessage({
-              type: NotificationTypeEnum.Error,
+              type: NotificationTypeEnum.Warning,
               text: value.text,
               origin: action.type
             })
@@ -53,6 +61,12 @@ export const reducer: Reducer<INotificationsState> = (state: INotificationsState
         alerts: state.alerts
       };
     }
+
+    case notificationActions.NOTIFICATION_CREATE:
+      return {
+        ...state,
+        alerts: state.alerts.set(action.payload.notification.id, action.payload.notification)
+      };
 
     case notificationActions.NOTIFICATION_REMOVE:
       return {
