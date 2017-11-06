@@ -73,7 +73,7 @@ class NotificationMessage extends React.PureComponent<INotificationMessageProps,
 
 const mapStateToProps = (state: IApplicationState, ownProps: INotificationMessageOwnProps): INotificationMessageDataProps => {
   return {
-    notification: state.notifications.alerts.get(ownProps.notificationId)
+    notification: state.notifications.messages.get(ownProps.notificationId)
   };
 };
 

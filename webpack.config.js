@@ -1,9 +1,9 @@
 const { resolve } = require('path');
-
 const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const OpenBrowserPlugin = require('open-browser-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const config = {
   devtool: 'cheap-module-eval-source-map',
@@ -22,17 +22,17 @@ const config = {
   output: {
     filename: 'bundle.js',
     path: resolve(__dirname, 'dist'),
-    publicPath: '',
+    publicPath: '/',
   },
 
   context: resolve(__dirname, 'src'),
 
   devServer: {
     hot: true,
-    contentBase: resolve(__dirname, 'build'),
+    contentBase: resolve(__dirname, 'public'),
     // TODO: production should run on different server
     historyApiFallback: true,
-    // publicPath: '/',
+    publicPath: '/',
   },
 
   module: {
@@ -100,6 +100,11 @@ const config = {
   },
 
   plugins: [
+    new HtmlWebpackPlugin({
+      template: resolve(__dirname, 'public/index.html'),
+      filename: 'index.html',
+      inject: 'body',
+    }),
     new webpack.LoaderOptionsPlugin({
       test: /\.js$/,
       options: {
@@ -110,11 +115,16 @@ const config = {
       },
     }),
     new webpack.optimize.ModuleConcatenationPlugin(),
-    new ExtractTextPlugin({ filename: './styles/style.css', disable: false, allChunks: true }),
+    new ExtractTextPlugin({
+      filename: 'styles/styles.css', disable: false, allChunks: true,
+    }),
     new CopyWebpackPlugin([{ from: 'vendors', to: 'vendors' }]),
     new OpenBrowserPlugin({ url: 'http://localhost:8080' }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(),
+    // new HtmlWebpackPlugin({
+    //   favicon: 'favicon.ico',
+    // }),
   ],
 };
 

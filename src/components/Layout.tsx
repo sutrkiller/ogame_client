@@ -1,7 +1,10 @@
 import * as React from 'react';
 import {NavMenu} from './navigation/NavMenu';
 import {ForgotPassword} from "./account/ForgotPassword";
-import {ROUTE_FORGOT_PASSWORD, ROUTE_HOME, ROUTE_REGISTER, ROUTE_SIGN_IN} from "../config/routes";
+import {
+  ROUTE_FORGOT_PASSWORD, ROUTE_HOME, ROUTE_REGISTER, ROUTE_REGISTER_SUCCESS,
+  ROUTE_SIGN_IN
+} from "../config/routes";
 import {NavLink, Route, Switch} from "react-router-dom";
 import {Home} from "./Home";
 import {SignIn} from "./account/Sign-in";
@@ -11,6 +14,7 @@ import {NavToggler} from "./navigation/NavToggler";
 import {RouteComponentProps, withRouter} from "react-router";
 import {Head} from "./Head";
 import {NotificationContainer} from "./_shared/notifications/NotificationContainer";
+import {RegisterSuccess} from "./account/RegisterSuccess";
 
 interface ILayoutDataProps {
 }
@@ -104,6 +108,7 @@ class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
         <Switch>
           <Route exact path={ROUTE_HOME} component={Home}/>
           <Route path={ROUTE_SIGN_IN} component={SignIn}/>
+          <Route path={ROUTE_REGISTER_SUCCESS} component={RegisterSuccess}/>
           <Route path={ROUTE_REGISTER} component={Register}/>
           <Route path={ROUTE_FORGOT_PASSWORD} component={ForgotPassword}/>
         </Switch>

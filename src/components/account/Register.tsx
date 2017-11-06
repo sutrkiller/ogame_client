@@ -3,18 +3,18 @@ import {ValidatedInput} from '../_shared/ValidatedInput';
 import {validateConfirmPasswordValue, validatePassword} from '../../utils/validateInput';
 import {connect} from "react-redux";
 import {actionCreators} from '../../store/Account';
-import MdSpinner, {default as MDSpinner} from 'react-md-spinner';
+import {default as MDSpinner} from 'react-md-spinner';
 import * as classNames from 'classnames';
 //types
 import {Dispatch} from '../../store/index'
 import {IApplicationState} from "../../store/index";
-import {ErrorMessage, ErrorScopeEnum, IErrorMessage} from "../../models/IError";
-import {Map, OrderedMap} from "immutable";
+import {IFieldError} from "../../models/IError";
+import { OrderedMap} from "immutable";
 import {Guid} from "../../models/Guid";
 
 interface IRegisterDataProps {
   isSubmitEnabled: boolean;
-  errors: Map<ErrorScopeEnum, OrderedMap<Guid, IErrorMessage>>;
+  errors: OrderedMap<Guid, IFieldError>;
 }
 
 interface IRegisterDispatchProps {
@@ -31,10 +31,11 @@ interface IRegisterState {
 interface IInputState {
   value: string;
   isValid: boolean;
-  errors: OrderedMap<Guid, IErrorMessage>;
+  errors: OrderedMap<Guid, IFieldError>;
 }
 
 interface RegisterElementsState {
+  //indexer
   [key: string]: IInputState;
 
   email: IInputState;
@@ -61,24 +62,38 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
   }
 
   componentWillReceiveProps(nextProps: IRegisterProps) {
-    const validNames = Object.keys(this.state.elements);
-    nextProps.errors
-      .filter((value, key) => validNames.some(n => n === key))
-      .forEach(((value: OrderedMap<Guid, IErrorMessage>, key: ErrorScopeEnum) => {
-        if (this.state.elements[key].errors !== value) {
-          this.setState(prevState => ({
-            elements: {
-              ...prevState.elements,
-              [key]: {
-                value: prevState.elements[key].value,
-                isValid: false,
-                errors: value,
-              }
-            },
-          }));
-        }
-      }));
+    const elementNames = this._changedElementName(nextProps);
+    if (elementNames.length === 0) {
+      return;
+    }
+    this.setState(prevState => ({
+      elements: {
+        ...prevState.elements,
+        ...elementNames.reduce((prev, cur )=> ({
+          ...prev,
+          ...this._getErrorsFromState(prevState, nextProps, cur),
+        }), {})}
+    }));
   }
+
+  _changedElementName = (nextProps: IRegisterProps) => {
+    const elementNames = Object.keys(this.state.elements);
+    let changedElements: string[] = [];
+    for(let i=0;i<elementNames.length; ++i) {
+      const el = elementNames[i];
+      if (this.state.elements[el].errors !== nextProps.errors.filter((v: IFieldError) => v.field === el)) {
+        changedElements = [...changedElements, el];
+      }
+    }
+    return changedElements;
+  };
+
+  _getErrorsFromState = (state: IRegisterState, props: IRegisterProps,  name: string) => {
+    const errors = props.errors.filter((x: IFieldError) => x.field === name);
+    return {
+      [name]: {...state.elements[name], isValid: errors.size === 0, errors: errors}
+    }
+  };
 
   _onRegister = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -103,7 +118,7 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
   }
 
   _onInputChange = (name: string, value: string, isValid: boolean) => {
-    let errors = OrderedMap<Guid, IErrorMessage>();
+    let errors = OrderedMap<Guid, IFieldError>();
     let useCustomMessageFirst = ['confirmPassword', 'password'].some(v => v == name);
 
     if (isValid || useCustomMessageFirst) {
@@ -131,7 +146,6 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
   render() {
     const hasBeenSubmitted = this.state.hasBeenSubmitted;
     const {email, userName, password, confirmPassword} = this.state.elements;
-
     return (
       <div>
         <button onClick={() => {
@@ -227,4 +241,3 @@ const mapDispatchToProps = (dispatch: Dispatch): IRegisterDispatchProps => {
 const registerContainer = connect<IRegisterDataProps, IRegisterDispatchProps>(mapStateToProps, mapDispatchToProps)(Register);
 
 export {registerContainer as Register};
-// TODO: add notifications for 'application'

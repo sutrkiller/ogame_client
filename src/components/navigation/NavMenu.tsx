@@ -45,7 +45,6 @@ export class NavMenu extends React.Component<INavMenuProps, INavMenuState> {
             </Tooltip>
           </NavItem>
         </Nav>
-        {/*<ReactTooltip />*/}
       </nav>);
   }
 }

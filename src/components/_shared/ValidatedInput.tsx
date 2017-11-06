@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
-import {IErrorMessage} from "../../models/IError";
-import {List, OrderedMap} from "immutable";
+import {IFieldError} from "../../models/IError";
+import {OrderedMap} from "immutable";
 import {Guid} from "../../models/Guid";
 
 interface IValidatedInputDataProps {
@@ -12,7 +12,7 @@ interface IValidatedInputDataProps {
   addOnClassName: string;
 
   isValid?: boolean;
-  errors?: OrderedMap<Guid, IErrorMessage>;
+  errors?: OrderedMap<Guid, IFieldError>;
 
   hintText?: string;
   required?: boolean;
@@ -43,7 +43,7 @@ class ValidatedInput extends React.PureComponent<IValidatedInputProps, IValidate
 
   _renderErrors = () => {
     if (this.props.errors && this.props.errors.size) {
-      return <ul className="form-input-error-list">{this.props.errors.valueSeq().toArray().map((value: IErrorMessage) => <li key={value.id}>{value.text}</li>)}</ul>
+      return <ul className="form-input-error-list">{this.props.errors.valueSeq().toArray().map((value: IFieldError) => <li key={value.id}>{value.text}</li>)}</ul>
     }
 
     const defaultMessage = this._input ? this._input.validationMessage : "Invalid input";

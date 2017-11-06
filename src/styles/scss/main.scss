@@ -7,7 +7,9 @@ $fa-font-path: "~font-awesome/fonts";
 @import 'shared/buttons';
 @import 'shared/tooltip';
 @import 'shared/notifications';
+
 @import 'components/navMenu';
+@import 'components/account';
 
 html {
 }
@@ -65,7 +67,6 @@ body {
 
   .header-title {
     position: absolute;
-    left: 50%;
     transform: translateX(-50%);
     height: $header-height;
     text-align: center;
@@ -209,6 +210,7 @@ body {
     }
   }
 
+  padding: 36px 24px 24px;
   position: fixed;
   top: $header-height;
   left: 0;
@@ -226,6 +228,7 @@ body {
     }
     .header-title {
       transition: transform 0.5s ease-in-out;
+      left: 50%;
 
       &.nav-open {
         transform: translateX($menu-open-width);
@@ -242,6 +245,9 @@ body {
     &.nav-open {
       left: 0;
     }
-    //transform: translateX($toggler-closed-width);
+  }
+
+  .header-title {
+    left: calc(50% + #{$toggler-closed-width}/2);
   }
 }

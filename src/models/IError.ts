@@ -2,8 +2,8 @@ import {Guid} from "./Guid";
 import {Record} from "immutable";
 import {guidGenerator} from "../utils/guidGenerator";
 
-export enum ErrorScopeEnum {
-  Application = 'application',
+export enum ErrorFieldEnum {
+  Unknown = 'unknown',
 
   Email = 'email',
   Username = 'userName',
@@ -11,53 +11,55 @@ export enum ErrorScopeEnum {
   ConfirmPassword = 'confirmPassword',
 }
 
-export const getErrorScope = (name: string): ErrorScopeEnum => {
+export const getErrorField = (name: string): ErrorFieldEnum => {
   let camelCased = name.substring(0,1).toLowerCase().concat(name.substring(1));
   switch (camelCased) {
     case 'email':
-      return ErrorScopeEnum.Email;
+      return ErrorFieldEnum.Email;
 
     case 'userName':
-      return ErrorScopeEnum.Username;
+      return ErrorFieldEnum.Username;
 
     case 'password':
-      return ErrorScopeEnum.Password;
+      return ErrorFieldEnum.Password;
 
     case 'confirmPassword':
-      return ErrorScopeEnum.ConfirmPassword;
+      return ErrorFieldEnum.ConfirmPassword;
 
     default:
-      return ErrorScopeEnum.Application;
+      debugger;
+      console.log('Parsed scope: ' + camelCased);
+      return ErrorFieldEnum.Unknown;
   }
 };
 
-export interface IErrorMessage {
+export interface IFieldError {
   id: Guid;
-  scope: ErrorScopeEnum;
+  field: ErrorFieldEnum;
   text: string;
 }
 
-const ErrorInitialState: IErrorMessage = {
+const FieldErrorInitialState: IFieldError = {
   id: '',
-  scope: ErrorScopeEnum.Application,
+  field: ErrorFieldEnum.Unknown,
   text: ''
 };
 
-type ErrorMessageParams = {
-  scope?: ErrorScopeEnum;
+type FieldErrorParams = {
+  field?: ErrorFieldEnum;
   text?: string;
 }
 
-export class ErrorMessage extends Record(ErrorInitialState) {
+export class FieldError extends Record(FieldErrorInitialState) {
   id: Guid;
-  scope: ErrorScopeEnum;
+  field: ErrorFieldEnum;
   text: string;
 
-  constructor(params?: ErrorMessageParams) {
+  constructor(params?: FieldErrorParams) {
     params ? super({id: guidGenerator(), ...params}) : super({id: guidGenerator()});
   }
 
-  with(values: ErrorMessageParams) {
+  with(values: FieldErrorParams) {
     return this.merge(values) as this;
   }
 }

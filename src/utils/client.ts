@@ -1,9 +1,10 @@
 import * as axios from 'axios';
 import {AxiosResponse} from "axios";
 import {Guid} from "../models/Guid";
-import {guidGenerator} from "./guidGenerator";
-import {ErrorMessage, ErrorScopeEnum, getErrorScope, IErrorMessage} from "../models/IError";
-import {Map, OrderedMap} from "immutable";
+import {FieldError, getErrorField, IFieldError} from "../models/IError";
+import {OrderedMap} from "immutable";
+import {IErrorServerModel, ServerErrorCode} from "../models/server/IErrorServerModel";
+import {INotificationMessage} from "../models/INotification";
 
 export const client = {
   register: (userName: string, email: string, password: string, confirmPassword: string) => clientInstance.post('account/register', {
@@ -14,8 +15,9 @@ export const client = {
   }),
 };
 
+// noinspection JSUnusedGlobalSymbols
 const clientInstance = axios.default.create({
-  baseURL: 'http://localhost:49318/api',
+  baseURL: 'http://localhost:49317/api',
   validateStatus: (status) => status < 500,
 });
 
@@ -23,37 +25,62 @@ clientInstance.defaults.headers.post['Content-Type'] = 'application/json; charse
 
 // client.defaults.headers.common['Authorization'] = window.localStorage.getItem('Token');
 
-interface IParseFailedResponseDependencies {
-  guidGenerator: () => Guid;
-}
-
 export const isSuccessStatus = (status: number) => status >= 200 && status < 300;
 
-const parseFailedResponseCreator = (dependencies: IParseFailedResponseDependencies) => (response: AxiosResponse): Map<ErrorScopeEnum, OrderedMap<Guid, IErrorMessage>> => {
+export interface IParsedErrorResponse {
+  notifications: OrderedMap<Guid, INotificationMessage>,
+  validationErrors: OrderedMap<Guid, IFieldError>
+}
+
+export const parseFailedResponse = (response: AxiosResponse): IParsedErrorResponse => {
   if (!response) {
     debugger;
   }
 
+  let notifications = OrderedMap<Guid, INotificationMessage>();
+  let validationErrors = OrderedMap<Guid, IFieldError>();
+
   switch (response.status) {
-    case 400:
-      return extractDataErrors(response.data, dependencies.guidGenerator);
+    case 400: //Bad request
+      validationErrors = extractServerValidationErrors(response.data);
+      notifications = extractServerNotifications(response.data);
+      break;
+
+    default: {
+      debugger;
+      throw new Error("Unknown response format");
+    }
   }
 
-  console.log(response);
-  throw new Error("Unknown response format");
+  return {
+    notifications,
+    validationErrors
+  }
 };
 
-const extractDataErrors = (data: object, guidGenerator: () => Guid): Map<ErrorScopeEnum, OrderedMap<Guid, IErrorMessage>> => {
-  return (<any>Object).entries(data).reduce((previous: Map<ErrorScopeEnum, OrderedMap<Guid, IErrorMessage>>, [name, messages]: [string, string[]]) => {
-    return previous.set(getErrorScope(name), OrderedMap(messages.map(message => new ErrorMessage({
-      text: message,
-      scope: getErrorScope(name)
-    })).map(error => OrderedMap([error.id, error]))));
-  }, Map<ErrorScopeEnum, OrderedMap<Guid, IErrorMessage>>());
+const extractServerValidationErrors = (content: IErrorServerModel): OrderedMap<Guid, IFieldError> => {
+  switch (content.code) {
+    case ServerErrorCode.DuplicateEmail:
+    case ServerErrorCode.UnreachableEmail:
+    case ServerErrorCode.InvalidModel:
+      return OrderedMap<Guid, IFieldError>(content.data.map(v => new FieldError({
+          field: getErrorField(v.name),
+          text: v.message
+        })).map(v => [v.id, v])
+      );
+  }
+
+  return OrderedMap<Guid, IFieldError>();
 };
 
-export const parseFailedResponse = parseFailedResponseCreator({
-  guidGenerator
-});
+const extractServerNotifications = (content: IErrorServerModel): OrderedMap<Guid, INotificationMessage> => {
+  switch (content.code) {
+    case ServerErrorCode.DuplicateEmail:
+    case ServerErrorCode.UnreachableEmail:
+    case ServerErrorCode.InvalidModel:
+      return OrderedMap<Guid, INotificationMessage>();
+  }
 
+  return OrderedMap<Guid, INotificationMessage>();
+};
 

@@ -43,11 +43,11 @@ class NotificationContainer extends React.PureComponent<INotificationContainerPr
 
 const mapStateToProps = (state: IApplicationState): INotificationContainerDataProps => {
   return {
-    notifications: state.notifications.alerts.keySeq().toList()
+    notifications: state.notifications.messages.keySeq().toList()
   };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch): INotificationContainerDispatchProps => {
+const mapDispatchToProps = (): INotificationContainerDispatchProps => {
   return {};
 };
 
