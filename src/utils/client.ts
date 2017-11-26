@@ -4,7 +4,7 @@ import {Guid} from "../models/Guid";
 import {FieldError, getErrorField, IFieldError} from "../models/IError";
 import {OrderedMap} from "immutable";
 import {IErrorServerModel, ServerErrorCode} from "../models/server/IErrorServerModel";
-import {INotificationMessage} from "../models/INotification";
+import {INotificationMessage, NotificationMessage, NotificationTypeEnum} from "../models/INotification";
 
 export const client = {
   register: (userName: string, email: string, password: string, confirmPassword: string) => clientInstance.post('account/register', {
@@ -13,6 +13,10 @@ export const client = {
     password,
     confirmPassword
   }),
+  confirmEmail: (userId: Guid, token: string) => clientInstance.post('account/confirmEmail', {
+    userId,
+    token
+  })
 };
 
 // noinspection JSUnusedGlobalSymbols
@@ -75,12 +79,17 @@ const extractServerValidationErrors = (content: IErrorServerModel): OrderedMap<G
 
 const extractServerNotifications = (content: IErrorServerModel): OrderedMap<Guid, INotificationMessage> => {
   switch (content.code) {
-    case ServerErrorCode.DuplicateEmail:
-    case ServerErrorCode.UnreachableEmail:
-    case ServerErrorCode.InvalidModel:
+    case ServerErrorCode.UnableToConfirmEmail:
+    case ServerErrorCode.UnkownError:
+      return OrderedMap<Guid, INotificationMessage>([new NotificationMessage({
+        text: content.message,
+        timeout: 10000,
+        type: NotificationTypeEnum.Error,
+        origin: `Server: ${content.code}`
+      })].map(m => [m.id, m]));
+
+    default:
       return OrderedMap<Guid, INotificationMessage>();
   }
-
-  return OrderedMap<Guid, INotificationMessage>();
 };
 

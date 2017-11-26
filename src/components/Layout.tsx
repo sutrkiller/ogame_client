@@ -2,7 +2,8 @@ import * as React from 'react';
 import {NavMenu} from './navigation/NavMenu';
 import {ForgotPassword} from "./account/ForgotPassword";
 import {
-  ROUTE_FORGOT_PASSWORD, ROUTE_HOME, ROUTE_REGISTER, ROUTE_REGISTER_SUCCESS,
+  ROUTE_FORGOT_PASSWORD, ROUTE_HOME, ROUTE_REGISTER, ROUTE_REGISTER_CONFIRM, ROUTE_REGISTER_CONFIRM_SUCCESS,
+  ROUTE_REGISTER_SUCCESS,
   ROUTE_SIGN_IN
 } from "../config/routes";
 import {NavLink, Route, Switch} from "react-router-dom";
@@ -15,6 +16,8 @@ import {RouteComponentProps, withRouter} from "react-router";
 import {Head} from "./Head";
 import {NotificationContainer} from "./_shared/notifications/NotificationContainer";
 import {RegisterSuccess} from "./account/RegisterSuccess";
+import {RegisterConfirm} from "./account/RegisterConfirm";
+import {RegisterConfirmSucess} from "./account/RegisterConfirmSuccess";
 
 interface ILayoutDataProps {
 }
@@ -33,7 +36,7 @@ class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
   static displayName = "Layout";
 
   navMenuRef: any;
-  navTogglerRef: any;
+  navToggleRef: any;
 
   constructor(props: ILayoutRoutedProps) {
     super(props);
@@ -67,7 +70,7 @@ class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
 
   _handleClickOutside = (event: Event) => {
     //to close it when clicked outside the menu
-    if (this.state.isMenuOpen && (this.navMenuRef && !this.navMenuRef.contains(event.target)) && (this.navTogglerRef && !this.navTogglerRef.contains(event.target))) {
+    if (this.state.isMenuOpen && (this.navMenuRef && !this.navMenuRef.contains(event.target)) && (this.navToggleRef && !this.navToggleRef.contains(event.target))) {
       this._onCloseMenu();
     }
   };
@@ -83,7 +86,7 @@ class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
     return <div className='container-fluid'>
       <Head />
       <header className="main-header">
-        <NavToggler isOpen={this.state.isMenuOpen} onToggle={this._onToggleMenu} setInnerRef={element => this.navTogglerRef = element}/>
+        <NavToggler isOpen={this.state.isMenuOpen} onToggle={this._onToggleMenu} setInnerRef={element => this.navToggleRef = element}/>
         <div className="header-part-right">
           <strong>
             <NavLink to={ROUTE_SIGN_IN} className='nav-link' onClick={this._onNavigation}>
@@ -104,11 +107,14 @@ class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
                isOpen={this.state.isMenuOpen}
                onNavigation={this._onNavigation}/>
 
+      {/*More specific first*/}
       <section className={classNames("content-main", {"nav-open": this.state.isMenuOpen})}>
         <Switch>
           <Route exact path={ROUTE_HOME} component={Home}/>
           <Route path={ROUTE_SIGN_IN} component={SignIn}/>
           <Route path={ROUTE_REGISTER_SUCCESS} component={RegisterSuccess}/>
+          <Route path={ROUTE_REGISTER_CONFIRM_SUCCESS} component={RegisterConfirmSucess}/>
+          <Route path={ROUTE_REGISTER_CONFIRM} component={RegisterConfirm}/>
           <Route path={ROUTE_REGISTER} component={Register}/>
           <Route path={ROUTE_FORGOT_PASSWORD} component={ForgotPassword}/>
         </Switch>
