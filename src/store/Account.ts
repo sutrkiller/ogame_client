@@ -9,6 +9,8 @@ import {IAction} from '../models/IAction';
 import {accountActions} from './actionTypes'
 import {OrderedMap} from "immutable";
 import {INotificationMessage, NotificationMessage, NotificationTypeEnum} from "../models/INotification";
+import {guidGenerator} from "../utils/guidGenerator";
+import {GuidEmpty} from "../utils/constants";
 
 export interface IToken {
   value: Guid;
@@ -25,6 +27,7 @@ export interface IUser {
 export interface IAccountState {
   isLoading: boolean;
   isSignedIn: boolean;
+  registerToken: Guid;
   token: IToken;
   user: IUser;
 }
@@ -32,8 +35,9 @@ export interface IAccountState {
 export interface IRegisterDependencies extends IServerRequestDependencies {
   registerStart: () => IAction;
   registerFail: (errors: IParsedErrorResponse) => IAction;
-  registerSuccess: () => IAction;
-  redirect: () => IAction;
+  registerSuccess: (succeessGuid: Guid) => IAction;
+  generateGuid: () => Guid;
+  redirect: (succeessGuid: Guid) => IAction;
 }
 
 export interface IConfirmEmailDependecies  extends  IServerRequestDependencies {
@@ -52,10 +56,12 @@ const registerStart = (): IAction => {
   }
 };
 
-const registerSuccess = (): IAction => {
+const registerSuccess = (registerToken: Guid): IAction => {
   return {
     type: accountActions.REGISTER_SUCCESS,
-    payload: {},
+    payload: {
+      registerToken
+    },
   }
 };
 
@@ -96,8 +102,9 @@ const registerCreator = (dependencies: IRegisterDependencies) => (userName: stri
   return client.register(userName, email, password, confirmPassword)
     .then(response => {
       if (isSuccessStatus(response.status)) {
-        dispatch(dependencies.registerSuccess());
-        dispatch(dependencies.redirect());
+        const registerToken = dependencies.generateGuid();
+        dispatch(dependencies.registerSuccess(registerToken));
+        dispatch(dependencies.redirect(registerToken));
       } else {
         const errors = dependencies.parseFailedResponse(response);
         dispatch(dependencies.registerFail(errors));
@@ -177,7 +184,8 @@ export const actionCreators = {
     registerSuccess,
     registerFail,
     parseFailedResponse,
-    redirect: () => replace(routes.ROUTE_REGISTER_SUCCESS),
+    generateGuid: guidGenerator,
+    redirect: (registerToken) => replace(routes.ROUTE_REGISTER_SUCCESS(registerToken)),
   }),
   confirmEmail: confirmEmailCreator({
     confirmEmailStart,
@@ -202,6 +210,7 @@ const initialUserState: IUser = {
 const initialState: IAccountState = {
   isSignedIn: false,
   isLoading: false,
+  registerToken: GuidEmpty,
   token: {
     value: "",
     expirationDate: new Date(),
@@ -229,10 +238,14 @@ export const reducer: Reducer<IAccountState> = (state: IAccountState = initialSt
       break;
 
     case accountActions.REGISTER_SUCCESS:
+    case LOCATION_CHANGE:
+      newState.isLoading = false;
+      newState.registerToken = action.payload.registerToken;
+      break;
+
     case accountActions.REGISTER_FAIL:
     case accountActions.CONFIRM_EMAIL_SUCCESS:
     case accountActions.CONFIRM_EMAIL_FAIL:
-    case LOCATION_CHANGE:
       newState.isLoading = false;
       break;
 

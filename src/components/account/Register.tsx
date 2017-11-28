@@ -11,19 +11,25 @@ import {IApplicationState} from "../../store/index";
 import {IFieldError} from "../../models/IError";
 import { OrderedMap} from "immutable";
 import {Guid} from "../../models/Guid";
+import {GuidEmpty} from "../../utils/constants";
+import {RouteComponentProps, withRouter} from "react-router";
+import {RegisterSuccess} from "./RegisterSuccess";
 
 interface IRegisterDataProps {
   isSubmitEnabled: boolean;
   errors: OrderedMap<Guid, IFieldError>;
+  registerToken: Guid;
 }
 
 interface IRegisterDispatchProps {
   onRegister: (userName: string, email: string, password: string, confirmPassword: string) => void;
 }
 
-type IRegisterProps = IRegisterDataProps & IRegisterDispatchProps;
+type IRegistredRoutedProps = RouteComponentProps<IRegisterDataProps>
+type IRegisterProps = IRegisterDataProps & IRegisterDispatchProps & IRegistredRoutedProps;
 
 interface IRegisterState {
+  showSuccess: boolean;
   elements: RegisterElementsState;
   hasBeenSubmitted: boolean;
 }
@@ -47,10 +53,13 @@ interface RegisterElementsState {
 class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
   static displayName = "Register";
 
+  _registerToken: Guid | null;
+
   constructor(props: IRegisterProps) {
     super(props);
 
     this.state = {
+      showSuccess: false,
       hasBeenSubmitted: false,
       elements: {
         email: {value: "", isValid: false, errors: OrderedMap()},
@@ -61,7 +70,13 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
     }
   }
 
+  componentDidMount() {
+    this._validateRegisterToken(this.props);
+  }
+
   componentWillReceiveProps(nextProps: IRegisterProps) {
+    this._validateRegisterToken(nextProps);
+
     const elementNames = this._changedElementName(nextProps);
     if (elementNames.length === 0) {
       return;
@@ -75,6 +90,15 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
         }), {})}
     }));
   }
+
+  _validateRegisterToken = (props: IRegisterProps) => {
+    const params = new URLSearchParams(props.location.search);
+    this._registerToken = params.get("token") || GuidEmpty;
+
+    if (this._registerToken !== GuidEmpty && this._registerToken === props.registerToken) {
+      this.setState(prev => ({showSuccess: true}))
+    }
+  };
 
   _changedElementName = (nextProps: IRegisterProps) => {
     const elementNames = Object.keys(this.state.elements);
@@ -144,6 +168,10 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
   };
 
   render() {
+    if (this.state.showSuccess) {
+      return <RegisterSuccess />
+    }
+
     const hasBeenSubmitted = this.state.hasBeenSubmitted;
     const {email, userName, password, confirmPassword} = this.state.elements;
     return (
@@ -229,6 +257,7 @@ const mapStateToProps = (state: IApplicationState): IRegisterDataProps => {
   return {
     isSubmitEnabled: !state.account.isLoading,
     errors: state.notifications.validationErrors,
+    registerToken: state.account.registerToken,
   };
 };
 
@@ -238,6 +267,7 @@ const mapDispatchToProps = (dispatch: Dispatch): IRegisterDispatchProps => {
   };
 };
 
-const registerContainer = connect<IRegisterDataProps, IRegisterDispatchProps>(mapStateToProps, mapDispatchToProps)(Register);
+const registerContainer = connect(mapStateToProps, mapDispatchToProps as any)(Register);
+const registerRouted = withRouter<IRegisterProps>(registerContainer);
 
-export {registerContainer as Register};
+export {registerRouted as Register};

@@ -3,7 +3,9 @@ export enum ServerErrorCode {
   DuplicateEmail = 402,
   UnreachableEmail = 403,
   UnableToConfirmEmail = 404,
-  UnkownError = 405
+  IncorrectSignInData = 405,
+
+  UnkownError = 500
 }
 
 export interface IErrorMessageServerModel {

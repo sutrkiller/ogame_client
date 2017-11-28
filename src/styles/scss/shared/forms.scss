@@ -13,6 +13,10 @@ ul, .form-input-error-list {
   padding: 0;
 }
 
+.custom-checkbox .custom-control-input.form-input-checkbox:checked ~ .custom-control-indicator {
+  background-color: $accent-color;
+}
+
 @media (min-width: 768px) {
   .form-bordered {
     margin-right: 0;

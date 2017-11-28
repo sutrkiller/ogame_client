@@ -8,7 +8,6 @@ import {connect} from "react-redux";
 import {GuidEmpty} from "../../utils/constants";
 
 interface IRegisterConfirmDataProps {
-  isConfirming: boolean;
 }
 
 interface IRegisterConfirmDispatchProps {
@@ -33,16 +32,12 @@ class RegisterConfirm extends React.PureComponent<IRegisterConfirmProps, IRegist
   }
 
   render() {
-    return this.props.isConfirming ? <noscript/> : <div className="text-message">
-      <p className="text-center"><strong>Congratulations,<br/> you have successfully confirmed an account!</strong></p>
-      <p className="text-center">Go to login.</p>
-    </div>
+    return <noscript/>;
   }
 }
 
 const mapStateToProps = (state: IApplicationState): IRegisterConfirmDataProps => {
   return {
-    isConfirming: state.account.isLoading,
   };
 };
 
@@ -53,8 +48,7 @@ const mapDispatchToProps = (dispatch: Dispatch) : IRegisterConfirmDispatchProps 
 };
 
 
-const registerContainer = connect(mapStateToProps, mapDispatchToProps as any)(RegisterConfirm);
-
-const RegisterConfirmRouted = withRouter<IRegisterConfirmProps>(registerContainer as any);
+const registerConfirmContainer = connect(mapStateToProps, mapDispatchToProps as any)(RegisterConfirm);
+const RegisterConfirmRouted = withRouter<IRegisterConfirmProps>(registerConfirmContainer);
 
 export {RegisterConfirmRouted as RegisterConfirm}

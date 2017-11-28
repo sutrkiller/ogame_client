@@ -112,7 +112,6 @@ class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
         <Switch>
           <Route exact path={ROUTE_HOME} component={Home}/>
           <Route path={ROUTE_SIGN_IN} component={SignIn}/>
-          <Route path={ROUTE_REGISTER_SUCCESS} component={RegisterSuccess}/>
           <Route path={ROUTE_REGISTER_CONFIRM_SUCCESS} component={RegisterConfirmSucess}/>
           <Route path={ROUTE_REGISTER_CONFIRM} component={RegisterConfirm}/>
           <Route path={ROUTE_REGISTER} component={Register}/>
