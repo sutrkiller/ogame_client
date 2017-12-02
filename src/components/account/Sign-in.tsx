@@ -32,7 +32,6 @@
 // export {SignIn};
 import * as React from 'react';
 import {ValidatedInput} from '../_shared/ValidatedInput';
-import {validateConfirmPasswordValue, validatePassword} from '../../utils/validateInput';
 import {connect} from "react-redux";
 import {actionCreators} from '../../store/Account';
 import {default as MDSpinner} from 'react-md-spinner';
@@ -234,9 +233,7 @@ const mapStateToProps = (state: IApplicationState): ISignInDataProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch): ISignInDispatchProps => {
   return {
-    onSignIn: (email: string, password: string) => {
-      console.log("Sign in action")
-    },
+    onSignIn: (email: string, password: string) => dispatch(actionCreators.signIn(email, password))
   };
 };
 

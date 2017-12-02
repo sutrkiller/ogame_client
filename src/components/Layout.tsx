@@ -3,58 +3,80 @@ import {NavMenu} from './navigation/NavMenu';
 import {ForgotPassword} from "./account/ForgotPassword";
 import {
   ROUTE_FORGOT_PASSWORD, ROUTE_HOME, ROUTE_REGISTER, ROUTE_REGISTER_CONFIRM, ROUTE_REGISTER_CONFIRM_SUCCESS,
-  ROUTE_REGISTER_SUCCESS,
-  ROUTE_SIGN_IN
+  ROUTE_SIGN_IN, ROUTE_SIGN_OUT
 } from "../config/routes";
-import {NavLink, Route, Switch} from "react-router-dom";
+import {Route, Switch, Redirect} from "react-router-dom";
 import {Home} from "./Home";
 import {SignIn} from "./account/Sign-in";
+import {SignOut} from "./account/Sign-out";
 import {Register} from "./account/Register";
 import * as classNames from 'classnames';
-import {NavToggler} from "./navigation/NavToggler";
-import {RouteComponentProps, withRouter} from "react-router";
+import {RouteComponentProps, RouteProps, withRouter} from "react-router";
 import {Head} from "./Head";
 import {NotificationContainer} from "./_shared/notifications/NotificationContainer";
-import {RegisterSuccess} from "./account/RegisterSuccess";
 import {RegisterConfirm} from "./account/RegisterConfirm";
-import {RegisterConfirmSucess} from "./account/RegisterConfirmSuccess";
+import {Header} from "./Header";
+import {IApplicationState} from "../store/index";
+import {Dispatch} from '../store/index';
+import {connect} from "react-redux";
+import {StorageKey_Token} from "../utils/constants";
+import {actionCreators} from "../store/Account";
+import {PrivateRoute} from "./_shared/routes/PrivateRoute";
+import {PublicRoute} from "./_shared/routes/PublicRoute";
+
+interface ILayoutOwnProps {
+}
 
 interface ILayoutDataProps {
+  isAuthenticated: boolean;
+  isAuthenticating: boolean;
 }
 
 interface ILayoutDispatchProps {
+  getAccountDetails: () => void;
 }
 
-type ILayoutProps = ILayoutDataProps & ILayoutDispatchProps;
-type ILayoutRoutedProps = RouteComponentProps<ILayoutProps>
+type ILayoutRoutedProps = RouteComponentProps<ILayoutDataProps>
+
+type ILayoutProps = ILayoutDataProps & ILayoutDispatchProps & ILayoutRoutedProps;
+
 
 interface ILayoutState {
   isMenuOpen: boolean;
+  isAccountMenuOpen: boolean;
 }
 
-class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
+class Layout extends React.Component<ILayoutProps, ILayoutState> {
   static displayName = "Layout";
 
-  navMenuRef: any;
-  navToggleRef: any;
+  _navMenuRef: any;
+  _navToggleRef: any;
 
-  constructor(props: ILayoutRoutedProps) {
+  _accountMenuRef: any;
+  _accountToggleRef: any;
+
+  constructor(props: ILayoutProps) {
     super(props);
 
     this.state = {
-      isMenuOpen: false
+      isMenuOpen: false,
+      isAccountMenuOpen: false,
     }
   }
 
   componentDidMount() {
-    document.addEventListener('mouseup', this._handleClickOutside);
-    document.addEventListener('touchend', this._handleClickOutside);
+    if (!this.props.isAuthenticated && localStorage.getItem(StorageKey_Token) !== null) {
+      this.props.getAccountDetails();
+    }
+
+    document.addEventListener('mouseup', this._handleClickOutsideMenu);
+    document.addEventListener('touchend', this._handleClickOutsideMenu);
     //window.addEventListener('resize', this.props.onCloseMenu);
   }
 
   componentWillUnmount() {
-    document.removeEventListener('mouseup', this._handleClickOutside);
-    document.removeEventListener('touchend', this._handleClickOutside);
+    document.removeEventListener('mouseup', this._handleClickOutsideMenu);
+    document.removeEventListener('touchend', this._handleClickOutsideMenu);
     //window.removeEventListener('resize', this.props.onCloseMenu);
   }
 
@@ -64,64 +86,98 @@ class Layout extends React.Component<ILayoutRoutedProps, ILayoutState> {
     });
   };
 
+  _onToggleAccountMenu = () => {
+    this.setState(prevState => ({isAccountMenuOpen: !prevState.isAccountMenuOpen}))
+  };
+
   _onCloseMenu = () => {
     this.setState(prevState => ({isMenuOpen: false}));
   };
 
-  _handleClickOutside = (event: Event) => {
-    //to close it when clicked outside the menu
-    if (this.state.isMenuOpen && (this.navMenuRef && !this.navMenuRef.contains(event.target)) && (this.navToggleRef && !this.navToggleRef.contains(event.target))) {
-      this._onCloseMenu();
-    }
+  _onCloseAccountMenu = () => {
+    this.setState(prevState => ({isAccountMenuOpen: false}))
   };
 
-  _onNavigation = (event:any) => {
+  _handleClickOutsideMenu = (event: Event) => {
+    //to close it when clicked outside the menu
+    if (this.state.isMenuOpen && (this._navMenuRef && !this._navMenuRef.contains(event.target)) && (this._navToggleRef && !this._navToggleRef.contains(event.target))) {
+      this._onCloseMenu();
+    }
+    else if (this.state.isAccountMenuOpen && (this._accountMenuRef && !this._accountMenuRef.contains(event.target)) && (this._accountToggleRef && !this._accountToggleRef.contains(event.target))) {
+      this._onCloseAccountMenu();
+    }
+
+
+  };
+
+  _onNavigation = (event: any) => {
     if (this.props.location.pathname === event.currentTarget.pathname) {
       event.preventDefault();
     }
-    this._onCloseMenu();
+    if (this.state.isMenuOpen) {
+      this._onCloseMenu();
+    }
+
+    if (this.state.isAccountMenuOpen) {
+      this._onCloseAccountMenu();
+    }
   };
 
   render() {
     return <div className='container-fluid'>
       <Head />
-      <header className="main-header">
-        <NavToggler isOpen={this.state.isMenuOpen} onToggle={this._onToggleMenu} setInnerRef={element => this.navToggleRef = element}/>
-        <div className="header-part-right">
-          <strong>
-            <NavLink to={ROUTE_SIGN_IN} className='nav-link' onClick={this._onNavigation}>
-              <span className='fa fa-fw fa-user fa-lg'/> <span className="nav-link-account">Register / sign in</span>
-            </NavLink>
-          </strong>
-        </div>
-        <div className={classNames("header-title", {"nav-open": this.state.isMenuOpen})}>
-          <h1>
-            <NavLink exact to={ROUTE_HOME} onClick={this._onNavigation}>Title</NavLink>
-          </h1>
-        </div>
-      </header>
+      <Header isMenuOpen={this.state.isMenuOpen}
+              isAccountMenuOpen={this.state.isAccountMenuOpen}
+              isAuthenticated={this.props.isAuthenticated}
+              isAuthenticating={this.props.isAuthenticating}
+              onNavigation={this._onNavigation}
+              onToggleMenu={this._onToggleMenu}
+              onToggleAccountMenu={this._onToggleAccountMenu}
+              setNavToggleRef={element => this._navToggleRef = element}
+              setAccountMenuRef={element => this._accountMenuRef = element}
+              setAccountToggleRef={element => this._accountToggleRef = element}
+      />
 
       <NotificationContainer />
 
-      <NavMenu setInnerRef={el => this.navMenuRef = el}
+      <NavMenu isAuthenticated={this.props.isAuthenticated}
                isOpen={this.state.isMenuOpen}
+               setMenuRef={el => this._navMenuRef = el}
                onNavigation={this._onNavigation}/>
 
       {/*More specific first*/}
       <section className={classNames("content-main", {"nav-open": this.state.isMenuOpen})}>
         <Switch>
           <Route exact path={ROUTE_HOME} component={Home}/>
-          <Route path={ROUTE_SIGN_IN} component={SignIn}/>
-          <Route path={ROUTE_REGISTER_CONFIRM_SUCCESS} component={RegisterConfirmSucess}/>
+          <PublicRoute isAuthenticated={this.props.isAuthenticated} path={ROUTE_SIGN_IN} component={SignIn}/>
+          <PrivateRoute isAuthenticated={this.props.isAuthenticated} path={ROUTE_SIGN_OUT} component={SignOut}/>
           <Route path={ROUTE_REGISTER_CONFIRM} component={RegisterConfirm}/>
-          <Route path={ROUTE_REGISTER} component={Register}/>
-          <Route path={ROUTE_FORGOT_PASSWORD} component={ForgotPassword}/>
+          <PublicRoute isAuthenticated={this.props.isAuthenticated} path={ROUTE_REGISTER} component={Register}/>
+          <PublicRoute isAuthenticated={this.props.isAuthenticated} path={ROUTE_FORGOT_PASSWORD} component={ForgotPassword}/>
+
+
         </Switch>
       </section>
     </div>;
   }
 }
 
-const LayoutRouted = withRouter<ILayoutProps>(Layout);
+
+
+const mapStateToProps = (state: IApplicationState): ILayoutDataProps => {
+  return {
+    isAuthenticated: state.account.isAuthenticated,
+    isAuthenticating: state.account.isAuthenticating,
+  };
+};
+
+const mapDispatchToProps = (dispatch: Dispatch): ILayoutDispatchProps => {
+  return {
+    getAccountDetails: () => {dispatch(actionCreators.getDetails())}
+  };
+};
+
+const layoutContainer = connect(mapStateToProps, mapDispatchToProps as any)(Layout);
+const LayoutRouted = withRouter<ILayoutOwnProps>(layoutContainer);
 
 export {LayoutRouted as Layout}

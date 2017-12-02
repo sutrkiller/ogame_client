@@ -257,7 +257,7 @@ const mapStateToProps = (state: IApplicationState): IRegisterDataProps => {
   return {
     isSubmitEnabled: !state.account.isLoading,
     errors: state.notifications.validationErrors,
-    registerToken: state.account.registerToken,
+    registerToken: state.account.successTokens.registerToken,
   };
 };
 

@@ -5,17 +5,42 @@ import {FieldError, getErrorField, IFieldError} from "../models/IError";
 import {OrderedMap} from "immutable";
 import {IErrorServerModel, ServerErrorCode} from "../models/server/IErrorServerModel";
 import {INotificationMessage, NotificationMessage, NotificationTypeEnum} from "../models/INotification";
+import {StorageKey_Token} from "./constants";
 
 export const client = {
-  register: (userName: string, email: string, password: string, confirmPassword: string) => clientInstance.post('account/register', {
+  register: (userName: string, email: string, password: string, confirmPassword: string) => post('account/register', {
     userName,
     email,
     password,
     confirmPassword
   }),
-  confirmEmail: (userId: Guid, token: string) => clientInstance.post('account/confirmEmail', {
+  confirmEmail: (userId: Guid, token: string) => post('account/confirmEmail', {
     userId,
     token
+  }),
+  signIn: (email: string, password: string) => post('account/signIn', {
+    email,
+    password
+  }),
+  signOut: () => postAuth('account/signOut', {
+  }),
+  accountDetails: () => getAuth('account/details')
+};
+
+const post = (endpoint: string, data: any) => clientInstance.post(endpoint, data);
+
+const postAuth = (endpoint: string, data: any) => {
+  return clientInstance.post(endpoint, data, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem(StorageKey_Token || '')}`
+  }})
+};
+
+const getAuth = (endpoint: string) => {
+  return clientInstance.get(endpoint, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem(StorageKey_Token || '')}`
+    }
   })
 };
 
