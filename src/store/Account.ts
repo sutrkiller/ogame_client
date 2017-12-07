@@ -27,6 +27,8 @@ export interface IUser {
 export interface ISuccessTokens {
   registerToken: Guid;
   confirmToken: Guid;
+  forgotToken: Guid;
+  resetToken: Guid;
 }
 
 export interface IAccountState {
@@ -66,7 +68,7 @@ export interface ISignInDependecies  extends  IServerRequestDependencies {
   onSuccess: () => IAction;
 }
 
-export interface ISignOutDependecies  extends  IServerRequestDependencies {
+export interface ISignOutDependencies  extends  IServerRequestDependencies {
   signOutStart: () => IAction;
   signOutFail: (errors: IParsedErrorResponse) => IAction;
   signOutSuccess: () => IAction;
@@ -77,6 +79,22 @@ export interface IGetDetailsDependencies  extends  IServerRequestDependencies {
   getDetailsStart: () => IAction;
   getDetailsFail: (errors: IParsedErrorResponse) => IAction;
   getDetailsSuccess: (token: IToken, user: IUser) => IAction;
+}
+
+export interface IForgotPasswordDependencies  extends  IServerRequestDependencies {
+  forgotPasswordStart: () => IAction;
+  forgotPasswordFail: (errors: IParsedErrorResponse) => IAction;
+  forgotPasswordSuccess: (forgotToken: Guid) => IAction;
+  generateGuid: () => Guid;
+  onSuccess: (forgotToken: Guid) => IAction;
+}
+
+export interface IResetPasswordDependencies  extends  IServerRequestDependencies {
+  resetPasswordStart: () => IAction;
+  resetPasswordFail: (errors: IParsedErrorResponse) => IAction;
+  resetPasswordSuccess: (forgotToken: Guid) => IAction;
+  generateGuid: () => Guid;
+  onSuccess: (resetToken: Guid) => IAction;
 }
 
 // ACTIONS ---------------------------------------------------------------------------------------------------------
@@ -207,6 +225,57 @@ const getDetailsFail = (errors: IParsedErrorResponse): IAction => {
   }
 };
 
+
+const forgotPasswordStart = (): IAction => {
+  return {
+    type: accountActions.FORGOT_PASSWORD_START,
+    payload: {},
+  }
+};
+
+const forgotPasswordSuccess = (forgotToken: Guid): IAction => {
+  return {
+    type: accountActions.FORGOT_PASSWORD_SUCCESS,
+    payload: {
+      forgotToken
+    },
+  }
+};
+
+const forgotPasswordFail = (errors: IParsedErrorResponse): IAction => {
+  return {
+    type: accountActions.FORGOT_PASSWORD_FAIL,
+    payload: {
+      ...errors
+    },
+  }
+};
+
+const resetPasswordStart = (): IAction => {
+  return {
+    type: accountActions.RESET_PASSWORD_START,
+    payload: {},
+  }
+};
+
+const resetPasswordSuccess = (resetToken: Guid): IAction => {
+  return {
+    type: accountActions.RESET_PASSWORD_SUCCESS,
+    payload: {
+      resetToken
+    },
+  }
+};
+
+const resetPasswordFail = (errors: IParsedErrorResponse): IAction => {
+  return {
+    type: accountActions.RESET_PASSWORD_FAIL,
+    payload: {
+      ...errors
+    },
+  }
+};
+
 // PRIVATE ACTION CREATORS ---------------------------------------------------------------------------------------------------------
 
 const registerCreator = (dependencies: IRegisterDependencies) => (userName: string, email: string, password: string, confirmPassword: string): AppThunkAction<IAction> => (dispatch) => {
@@ -328,7 +397,7 @@ const signInCreator = (dependencies: ISignInDependecies) => (email: string, pass
     });
 };
 
-const signOutCreator = (dependencies: ISignOutDependecies) => (): AppThunkAction<IAction> => (dispatch) => {
+const signOutCreator = (dependencies: ISignOutDependencies) => (): AppThunkAction<IAction> => (dispatch) => {
   dispatch(dependencies.signOutStart());
   return client.signOut()
     .then(response => {
@@ -358,6 +427,43 @@ const signOutCreator = (dependencies: ISignOutDependecies) => (): AppThunkAction
         };
 
         dispatch(dependencies.signOutFail(result));
+        return;
+      }
+      debugger;
+      throw new Error('This should not happen!');
+    });
+};
+
+const forgotPasswordCreator = (dependencies: IForgotPasswordDependencies) => (email: string): AppThunkAction<IAction> => (dispatch) => {
+  dispatch(dependencies.forgotPasswordStart());
+  return client.forgotPassword(email)
+    .then(response => {
+      if (isSuccessStatus(response.status)) {
+        const forgotToken = dependencies.generateGuid();
+        dispatch(dependencies.forgotPasswordSuccess(forgotToken));
+        dispatch(dependencies.onSuccess(forgotToken));
+      } else {
+        const errors = dependencies.parseFailedResponse(response);
+        dispatch(dependencies.forgotPasswordFail(errors));
+      }
+    })
+    .catch(failed => {
+      if (!failed.response) {
+        const error = new NotificationMessage({
+          text: 'There was a network error when communicating with the server.',
+          origin: 'POST /account/forgot-password',
+          timeout: 5000,
+          type: NotificationTypeEnum.Error
+        });
+
+        const result = {
+          notifications: OrderedMap<Guid, INotificationMessage>({
+            [error.id]: error
+          }),
+          validationErrors: OrderedMap<Guid, IFieldError>()
+        };
+
+        dispatch(dependencies.forgotPasswordFail(result));
         return;
       }
       debugger;
@@ -398,6 +504,43 @@ const getDetailsCreator = (dependencies: IGetDetailsDependencies) => (): AppThun
         };
 
         dispatch(dependencies.getDetailsFail(result));
+        return;
+      }
+      debugger;
+      throw new Error('This should not happen!');
+    });
+};
+
+const resetPasswordCreator = (dependencies: IResetPasswordDependencies) => (userId: Guid, token: string, password: string, confirmPassword: string): AppThunkAction<IAction> => (dispatch) => {
+  dispatch(dependencies.resetPasswordStart());
+  return client.resetPassword(userId, token, password, confirmPassword)
+    .then(response => {
+      if (isSuccessStatus(response.status)) {
+        const resetToken = dependencies.generateGuid();
+        dispatch(dependencies.resetPasswordSuccess(resetToken));
+        dispatch(dependencies.onSuccess(resetToken));
+      } else {
+        const errors = dependencies.parseFailedResponse(response);
+        dispatch(dependencies.resetPasswordFail(errors));
+      }
+    })
+    .catch(failed => {
+      if (!failed.response) {
+        const error = new NotificationMessage({
+          text: 'There was a network error when communicating with the server.',
+          origin: 'POST /account/resetPassword',
+          timeout: 5000,
+          type: NotificationTypeEnum.Error
+        });
+
+        const result = {
+          notifications: OrderedMap<Guid, INotificationMessage>({
+            [error.id]: error
+          }),
+          validationErrors: OrderedMap<Guid, IFieldError>()
+        };
+
+        dispatch(dependencies.resetPasswordFail(result));
         return;
       }
       debugger;
@@ -446,6 +589,22 @@ export const actionCreators = {
     getDetailsFail,
     parseFailedResponse,
   }),
+  forgotPassword: forgotPasswordCreator({
+    forgotPasswordStart,
+    forgotPasswordSuccess,
+    forgotPasswordFail,
+    parseFailedResponse,
+    generateGuid: guidGenerator,
+    onSuccess: (forgotToken) => replace(routes.ROUTE_FORGOT_PASSWORD_SUCCESS(forgotToken)),
+  }),
+  resetPassword: resetPasswordCreator({
+    resetPasswordStart,
+    resetPasswordSuccess,
+    resetPasswordFail,
+    parseFailedResponse,
+    generateGuid: guidGenerator,
+    onSuccess: (resetToken => replace(routes.ROUTE_RESET_PASSWORD_SUCCESS(resetToken)))
+  })
 };
 
 //REDUCERS ---------------------------------------------------------------------------------------------------------
@@ -465,6 +624,8 @@ const initialTokenState: IToken = {
 const initialSuccessTokensState: ISuccessTokens = {
   registerToken: GuidEmpty,
   confirmToken: GuidEmpty,
+  forgotToken: GuidEmpty,
+  resetToken: GuidEmpty,
 };
 
 const initialState: IAccountState = {
@@ -476,6 +637,7 @@ const initialState: IAccountState = {
   user: initialUserState,
 };
 
+//TODO: when signed in, show bar if email not confirmed
 const userReducer: Reducer<IUser> = (state: IUser = initialUserState, action: IAction) => {
   switch (action.type) {
     case accountActions.CONFIRM_EMAIL_SUCCESS:
@@ -501,6 +663,12 @@ const successTokensReducer: Reducer<ISuccessTokens> = (state: ISuccessTokens = i
     case accountActions.CONFIRM_EMAIL_SUCCESS:
       return {...state, confirmToken: action.payload.confirmToken};
 
+    case accountActions.FORGOT_PASSWORD_SUCCESS:
+      return {...state, forgotToken: action.payload.forgotToken};
+
+    case accountActions.RESET_PASSWORD_SUCCESS:
+      return {...state, resetToken: action.payload.resetToken};
+
     case LOCATION_CHANGE:
       return initialSuccessTokensState;
 
@@ -515,6 +683,8 @@ export const reducer: Reducer<IAccountState> = (state: IAccountState = initialSt
   switch (action.type) {
     case accountActions.REGISTER_START:
     case accountActions.CONFIRM_EMAIL_START:
+    case accountActions.FORGOT_PASSWORD_START:
+    case accountActions.RESET_PASSWORD_START:
       newState.isLoading = true;
       break;
 
@@ -523,11 +693,6 @@ export const reducer: Reducer<IAccountState> = (state: IAccountState = initialSt
     case accountActions.ACCOUNT_DETAILS_START:
       newState.isAuthenticating = true;
       newState.isLoading = true;
-      break;
-
-    case accountActions.REGISTER_SUCCESS:
-    case LOCATION_CHANGE:
-      newState.isLoading = false;
       break;
 
     case accountActions.SIGN_IN_SUCCESS:
@@ -545,12 +710,18 @@ export const reducer: Reducer<IAccountState> = (state: IAccountState = initialSt
       newState.token = initialTokenState;
       break;
 
+    case accountActions.REGISTER_SUCCESS:
     case accountActions.REGISTER_FAIL:
     case accountActions.SIGN_IN_FAIL:
     case accountActions.CONFIRM_EMAIL_SUCCESS:
     case accountActions.CONFIRM_EMAIL_FAIL:
     case accountActions.SIGN_OUT_FAIL:
     case accountActions.ACCOUNT_DETAILS_FAIL:
+    case accountActions.FORGOT_PASSWORD_SUCCESS:
+    case accountActions.FORGOT_PASSWORD_FAIL:
+    case accountActions.RESET_PASSWORD_SUCCESS:
+    case accountActions.RESET_PASSWORD_FAIL:
+    case LOCATION_CHANGE:
       newState.isLoading = false;
       newState.isAuthenticating = false;
       break;

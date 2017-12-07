@@ -2,22 +2,23 @@ import * as React from 'react';
 import {NavMenu} from './navigation/NavMenu';
 import {ForgotPassword} from "./account/ForgotPassword";
 import {
-  ROUTE_FORGOT_PASSWORD, ROUTE_HOME, ROUTE_REGISTER, ROUTE_REGISTER_CONFIRM, ROUTE_REGISTER_CONFIRM_SUCCESS,
+  ROUTE_FORGOT_PASSWORD, ROUTE_HOME, ROUTE_REGISTER, ROUTE_REGISTER_CONFIRM,
+  ROUTE_RESET_PASSWORD,
   ROUTE_SIGN_IN, ROUTE_SIGN_OUT
 } from "../config/routes";
-import {Route, Switch, Redirect} from "react-router-dom";
+import {Route, Switch} from "react-router-dom";
 import {Home} from "./Home";
 import {SignIn} from "./account/Sign-in";
 import {SignOut} from "./account/Sign-out";
 import {Register} from "./account/Register";
+import {ResetPassword} from "./account/ResetPassword";
 import * as classNames from 'classnames';
-import {RouteComponentProps, RouteProps, withRouter} from "react-router";
+import {RouteComponentProps, withRouter} from "react-router";
 import {Head} from "./Head";
 import {NotificationContainer} from "./_shared/notifications/NotificationContainer";
 import {RegisterConfirm} from "./account/RegisterConfirm";
 import {Header} from "./Header";
-import {IApplicationState} from "../store/index";
-import {Dispatch} from '../store/index';
+import {IApplicationState, Dispatch} from "../store/index";
 import {connect} from "react-redux";
 import {StorageKey_Token} from "../utils/constants";
 import {actionCreators} from "../store/Account";
@@ -91,11 +92,11 @@ class Layout extends React.Component<ILayoutProps, ILayoutState> {
   };
 
   _onCloseMenu = () => {
-    this.setState(prevState => ({isMenuOpen: false}));
+    this.setState(() => ({isMenuOpen: false}));
   };
 
   _onCloseAccountMenu = () => {
-    this.setState(prevState => ({isAccountMenuOpen: false}))
+    this.setState(() => ({isAccountMenuOpen: false}))
   };
 
   _handleClickOutsideMenu = (event: Event) => {
@@ -154,8 +155,7 @@ class Layout extends React.Component<ILayoutProps, ILayoutState> {
           <Route path={ROUTE_REGISTER_CONFIRM} component={RegisterConfirm}/>
           <PublicRoute isAuthenticated={this.props.isAuthenticated} path={ROUTE_REGISTER} component={Register}/>
           <PublicRoute isAuthenticated={this.props.isAuthenticated} path={ROUTE_FORGOT_PASSWORD} component={ForgotPassword}/>
-
-
+          <PublicRoute isAuthenticated={this.props.isAuthenticated} path={ROUTE_RESET_PASSWORD} component={ResetPassword}/>
         </Switch>
       </section>
     </div>;

@@ -47,6 +47,8 @@ export const reducer: Reducer<INotificationsState> = (state: INotificationsState
     case accountActions.SIGN_IN_FAIL:
     case accountActions.SIGN_OUT_FAIL:
     case accountActions.ACCOUNT_DETAILS_FAIL:
+    case accountActions.FORGOT_PASSWORD_FAIL:
+    case accountActions.RESET_PASSWORD_FAIL:
       return {
         validationErrors: action.payload.validationErrors,
         messages: state.messages.merge(action.payload.notifications)

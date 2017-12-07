@@ -1,12 +1,11 @@
 import * as React from 'react';
 import {RouteComponentProps, withRouter} from "react-router";
 import {Guid} from "../../models/Guid";
-import {IApplicationState} from "../../store/index";
-import {Dispatch} from "../../store/index";
+import {IApplicationState, Dispatch} from "../../store";
 import {actionCreators} from "../../store/Account";
 import {connect} from "react-redux";
 import {GuidEmpty} from "../../utils/constants";
-import {RegisterConfirmSucess} from "./RegisterConfirmSuccess";
+import {RegisterConfirmSuccess} from "./success/RegisterConfirmSuccess";
 
 interface IRegisterConfirmDataProps {
   confirmToken: Guid;
@@ -57,14 +56,14 @@ class RegisterConfirm extends React.PureComponent<IRegisterConfirmProps, IRegist
     this._confirmToken = params.get("token") || GuidEmpty;
 
     if (this._confirmToken !== GuidEmpty && this._confirmToken === props.confirmToken) {
-      this.setState(prev => ({showSuccess: true}));
+      this.setState(() => ({showSuccess: true}));
       return true;
     }
     return false;
   };
 
   render() {
-    return this.state.showSuccess ? <RegisterConfirmSucess isAuthenticated={this.props.isAuthenticated} /> : <noscript/>;
+    return this.state.showSuccess ? <RegisterConfirmSuccess isAuthenticated={this.props.isAuthenticated} /> : <noscript/>;
   }
 }
 

@@ -8,28 +8,31 @@ import * as classNames from 'classnames';
 //types
 import {Dispatch, IApplicationState} from '../../store'
 import {IFieldError} from "../../models/IError";
-import { OrderedMap} from "immutable";
+import {OrderedMap} from "immutable";
 import {Guid} from "../../models/Guid";
 import {GuidEmpty} from "../../utils/constants";
-import {RouteComponentProps, withRouter} from "react-router";
-import {RegisterSuccess} from "./success/RegisterSuccess";
+import {RouteComponentProps, withRouter} from "react-router-dom";
+import {ResetPasswordSucess} from "./success/ResetPasswordSuccess";
+import {replace} from "react-router-redux";
+import {ROUTE_HOME} from "../../config/routes";
 
-interface IRegisterDataProps {
+interface IResetPasswordDataProps {
   isSubmitEnabled: boolean;
   errors: OrderedMap<Guid, IFieldError>;
-  registerToken: Guid;
+  resetToken: Guid;
 }
 
-interface IRegisterDispatchProps {
-  onRegister: (userName: string, email: string, password: string, confirmPassword: string) => void;
+interface IResetPasswordDispatchProps {
+  onInvalidParameters: () => void;
+  onResetPassword: (userId: Guid, token: string, password: string, confirmPassword: string) => void;
 }
 
-type IRegisterRoutedProps = RouteComponentProps<IRegisterDataProps>;
-type IRegisterProps = IRegisterDataProps & IRegisterDispatchProps & IRegisterRoutedProps;
+type IResetRoutedProps = RouteComponentProps<IResetPasswordDataProps>;
+type IResetPasswordProps = IResetPasswordDataProps & IResetPasswordDispatchProps & IResetRoutedProps;
 
-interface IRegisterState {
+interface IResetPasswordState {
   showSuccess: boolean;
-  elements: RegisterElementsState;
+  elements: ResetPasswordElementsState;
   hasBeenSubmitted: boolean;
 }
 
@@ -39,30 +42,28 @@ interface IInputState {
   errors: OrderedMap<Guid, IFieldError>;
 }
 
-interface RegisterElementsState {
+interface ResetPasswordElementsState {
   //indexer
   [key: string]: IInputState;
 
-  email: IInputState;
-  userName: IInputState;
   password: IInputState;
   confirmPassword: IInputState;
 }
 
-class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
-  static displayName = "Register";
+class ResetPassword extends React.PureComponent<IResetPasswordProps, IResetPasswordState> {
+  static displayName = "ResetPassword";
 
-  _registerToken: Guid | null;
+  _resetToken: Guid | null;
+  _userId: Guid = GuidEmpty;
+  _token: string = '';
 
-  constructor(props: IRegisterProps) {
+  constructor(props: IResetPasswordProps) {
     super(props);
 
     this.state = {
       showSuccess: false,
       hasBeenSubmitted: false,
       elements: {
-        email: {value: "", isValid: false, errors: OrderedMap()},
-        userName: {value: "", isValid: false, errors: OrderedMap()},
         password: {value: "", isValid: false, errors: OrderedMap()},
         confirmPassword: {value: "", isValid: false, errors: OrderedMap()},
       }
@@ -70,11 +71,20 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
   }
 
   componentDidMount() {
-    this._validateRegisterToken(this.props);
+    const params = new URLSearchParams(this.props.location.search);
+    this._userId = params.get("userId") || GuidEmpty;
+    this._token = params.get("token") || '';
+
+    if (this._userId === GuidEmpty || this._token === '') {
+      this.props.onInvalidParameters();
+      return;
+    }
+
+    this._validateResetPasswordToken(this.props);
   }
 
-  componentWillReceiveProps(nextProps: IRegisterProps) {
-    this._validateRegisterToken(nextProps);
+  componentWillReceiveProps(nextProps: IResetPasswordProps) {
+    this._validateResetPasswordToken(nextProps);
 
     const elementNames = this._changedElementName(nextProps);
     if (elementNames.length === 0) {
@@ -83,26 +93,27 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
     this.setState(prevState => ({
       elements: {
         ...prevState.elements,
-        ...elementNames.reduce((prev, cur )=> ({
+        ...elementNames.reduce((prev, cur) => ({
           ...prev,
           ...this._getErrorsFromState(prevState, nextProps, cur),
-        }), {})}
+        }), {})
+      }
     }));
   }
 
-  _validateRegisterToken = (props: IRegisterProps) => {
+  _validateResetPasswordToken = (props: IResetPasswordProps) => {
     const params = new URLSearchParams(props.location.search);
-    this._registerToken = params.get("token") || GuidEmpty;
+    this._resetToken = params.get("token") || GuidEmpty;
 
-    if (this._registerToken !== GuidEmpty && this._registerToken === props.registerToken) {
+    if (this._resetToken !== GuidEmpty && this._resetToken === props.resetToken) {
       this.setState(() => ({showSuccess: true}))
     }
   };
 
-  _changedElementName = (nextProps: IRegisterProps) => {
+  _changedElementName = (nextProps: IResetPasswordProps) => {
     const elementNames = Object.keys(this.state.elements);
     let changedElements: string[] = [];
-    for(let i=0;i<elementNames.length; ++i) {
+    for (let i = 0; i < elementNames.length; ++i) {
       const el = elementNames[i];
       if (this.state.elements[el].errors !== nextProps.errors.filter((v: IFieldError) => v.field === el)) {
         changedElements = [...changedElements, el];
@@ -111,23 +122,23 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
     return changedElements;
   };
 
-  _getErrorsFromState = (state: IRegisterState, props: IRegisterProps,  name: string) => {
+  _getErrorsFromState = (state: IResetPasswordState, props: IResetPasswordProps, name: string) => {
     const errors = props.errors.filter((x: IFieldError) => x.field === name);
     return {
       [name]: {...state.elements[name], isValid: errors.size === 0, errors: errors}
     }
   };
 
-  _onRegister = (event: React.FormEvent<HTMLFormElement>) => {
+  _onResetPassword = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const {email, userName, password, confirmPassword} = this.state.elements;
-    const isValid = email.isValid && userName.isValid && password.isValid && confirmPassword.isValid;
+    const {password, confirmPassword} = this.state.elements;
+    const isValid = password.isValid && confirmPassword.isValid;
 
     this.setState(() => ({hasBeenSubmitted: true}));
 
     if (isValid) {
-      this.props.onRegister(userName.value, email.value, password.value, confirmPassword.value);
+      this.props.onResetPassword(this._userId, this._token, password.value, confirmPassword.value);
     }
   };
 
@@ -168,49 +179,15 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
 
   render() {
     if (this.state.showSuccess) {
-      return <RegisterSuccess />
+      return <ResetPasswordSucess />
     }
 
     const hasBeenSubmitted = this.state.hasBeenSubmitted;
-    const {email, userName, password, confirmPassword} = this.state.elements;
+    const {password, confirmPassword} = this.state.elements;
     return (
       <div>
-        <button onClick={() => {
-          this.setState(prev => ({
-            ...prev,
-            elements: {
-              email: {...prev.elements.email, value: "tobias.kamenicky@gmail.com", isValid: true},
-              userName: {...prev.elements.userName, value: "username", isValid: true},
-              password: {...prev.elements.password, value: "Password1", isValid: true},
-              confirmPassword: {...prev.elements.confirmPassword, value: "Password1", isValid: true},
-            }
-          }))
-        }}>Cheat </button>
-
-
-        <form onSubmit={this._onRegister} className="form-bordered" noValidate>
+        <form onSubmit={this._onResetPassword} className="form-bordered" noValidate>
           <fieldset disabled={!this.props.isSubmitEnabled}>
-            <ValidatedInput name="email"
-                            addOnClassName="fa fa-fw fa-envelope-o"
-                            type="email"
-                            placeholder="E-mail"
-                            value={email.value}
-                            onChange={this._onInputChange}
-                            errors={email.errors}
-                            isValid={hasBeenSubmitted ? email.isValid : true}
-                            required/>
-
-            <ValidatedInput name="userName"
-                            addOnClassName="fa fa-fw fa-user-o"
-                            hintText="Username must be 4-20 characters long."
-                            type="text"
-                            placeholder="Username"
-                            value={userName.value}
-                            onChange={this._onInputChange}
-                            errors={userName.errors}
-                            isValid={hasBeenSubmitted ? userName.isValid : true}
-                            minLength={4} maxLength={20} required/>
-
             <ValidatedInput name="password"
                             addOnClassName="fa fa-fw fa-key"
                             hintText="You password must be 8-20 characters long with 6 unique letters, contain uppercase/lowercase letters and numbers."
@@ -235,7 +212,7 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
             <div>
               <button type="submit" className="button confirm">
                 <div className='button-content'>
-                  <span>Create account</span>
+                  <span>Set new password</span>
                 </div>
                 <div className="button-icon confirm">
                   {this.props.isSubmitEnabled
@@ -252,21 +229,22 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
   };
 }
 
-const mapStateToProps = (state: IApplicationState): IRegisterDataProps => {
+const mapStateToProps = (state: IApplicationState): IResetPasswordDataProps => {
   return {
     isSubmitEnabled: !state.account.isLoading,
     errors: state.notifications.validationErrors,
-    registerToken: state.account.successTokens.registerToken,
+    resetToken: state.account.successTokens.resetToken,
   };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch): IRegisterDispatchProps => {
+const mapDispatchToProps = (dispatch: Dispatch): IResetPasswordDispatchProps => {
   return {
-    onRegister: (userName: string, email: string, password: string, confirmPassword: string) => dispatch(actionCreators.register(userName, email, password, confirmPassword)),
+    onInvalidParameters: () => dispatch(replace(ROUTE_HOME)),
+    onResetPassword: (userId: Guid, token: string, password: string, confirmPassword: string) => dispatch(actionCreators.resetPassword(userId, token, password, confirmPassword)),
   };
 };
 
-const registerContainer = connect(mapStateToProps, mapDispatchToProps as any)(Register);
-const registerRouted = withRouter<IRegisterProps>(registerContainer);
+const registerContainer = connect(mapStateToProps, mapDispatchToProps as any)(ResetPassword);
+const resetRouted = withRouter<IResetPasswordProps>(registerContainer);
 
-export {registerRouted as Register};
+export {resetRouted as ResetPassword};

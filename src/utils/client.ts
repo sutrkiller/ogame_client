@@ -24,7 +24,16 @@ export const client = {
   }),
   signOut: () => postAuth('account/signOut', {
   }),
-  accountDetails: () => getAuth('account/details')
+  accountDetails: () => getAuth('account/details'),
+  forgotPassword: (email: string) => post('account/forgotPassword', {
+    email
+  }),
+  resetPassword: (userId: Guid, token: string, password: string, confirmPassword: string) => post('account/resetPassword', {
+    userId,
+    token,
+    password,
+    confirmPassword
+  }),
 };
 
 const post = (endpoint: string, data: any) => clientInstance.post(endpoint, data);
@@ -92,6 +101,10 @@ const extractServerValidationErrors = (content: IErrorServerModel): OrderedMap<G
     case ServerErrorCode.DuplicateEmail:
     case ServerErrorCode.UnreachableEmail:
     case ServerErrorCode.InvalidModel:
+    case ServerErrorCode.IncorrectSignInData:
+    case ServerErrorCode.AccountNotFound:
+    case ServerErrorCode.UnableToRecoverPassword:
+    case ServerErrorCode.UnableToResetPassword:
       return OrderedMap<Guid, IFieldError>(content.data.map(v => new FieldError({
           field: getErrorField(v.name),
           text: v.message

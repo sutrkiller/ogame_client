@@ -47,7 +47,7 @@ body {
     display: flex;
     justify-content: flex-end;
     flex: 1;
-//todo: add style isAuthenticating loader
+    //todo: add style isAuthenticating loader
     .content-right {
       border-left: $border-default-width solid $border-default-color;
 
@@ -239,6 +239,48 @@ body {
 
 .display-none {
   display: none;
+}
+
+.sign-in-buttons {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: baseline;
+  color: $text-light-color;
+
+  &-register {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    color: $text-light-color;
+    transition: color 0.4s ease-in-out;
+
+    &:hover {
+      text-decoration: none;
+      //color: #;
+      //font-size: 1.05em;
+    }
+  }
+}
+
+.nav-link-secondary {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  color: $text-light-color;
+  transition: color 0.4s ease-in-out;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.form-sign-in {
+  padding-bottom: 16px;
+  border-bottom: $border-default-width solid $border-default-color;
+}
+
+.form-sign-in + .nav-link-button {
+  display: inline-block;
+  font-size: 0.95em;
 }
 
 @media (max-width: $device-small-width) {

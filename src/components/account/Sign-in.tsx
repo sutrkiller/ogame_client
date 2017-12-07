@@ -1,35 +1,3 @@
-// import * as React from 'react';
-// import {Link} from "react-router-dom";
-// import {ROUTE_FORGOT_PASSWORD, ROUTE_REGISTER} from "../../config/routes";
-//
-// const SignIn = () => {
-//   return (
-//     <div>
-//       <h2>Sign in</h2>
-//       <form>
-//         <div>
-//           <label>Email</label>
-//           <input type="email"/>
-//         </div>
-//         <div>
-//           <label>Password</label>
-//           <input type="password"/>
-//         </div>
-//         <div>
-//           <input type="checkbox"/>
-//           <label>Remember me</label>
-//         </div>
-//         <button type="submit">Sign in</button>
-//         or
-//         <Link to={ROUTE_REGISTER} className="btn btn-outline-dark">Register</Link>
-//       </form>
-//       <span><Link to={ROUTE_FORGOT_PASSWORD}>Forgot password?</Link></span>
-//     </div>
-//
-//   );
-// };
-//
-// export {SignIn};
 import * as React from 'react';
 import {ValidatedInput} from '../_shared/ValidatedInput';
 import {connect} from "react-redux";
@@ -37,11 +5,12 @@ import {actionCreators} from '../../store/Account';
 import {default as MDSpinner} from 'react-md-spinner';
 import * as classNames from 'classnames';
 //types
-import {Dispatch} from '../../store/index'
-import {IApplicationState} from "../../store/index";
+import {IApplicationState, Dispatch} from "../../store";
 import {IFieldError} from "../../models/IError";
 import {OrderedMap} from "immutable";
 import {Guid} from "../../models/Guid";
+import {NavLink} from "react-router-dom";
+import {ROUTE_FORGOT_PASSWORD, ROUTE_REGISTER} from "../../config/routes";
 
 interface ISignInDataProps {
   isSubmitEnabled: boolean;
@@ -131,7 +100,7 @@ class SignIn extends React.PureComponent<ISignInProps, ISignInState> {
     const {email, password} = this.state.elements;
     const isValid = email.isValid && password.isValid;
 
-    this.setState(prevState => ({hasBeenSubmitted: true}));
+    this.setState(() => ({hasBeenSubmitted: true}));
 
     if (isValid) {
       this.props.onSignIn(email.value, password.value);
@@ -174,7 +143,7 @@ class SignIn extends React.PureComponent<ISignInProps, ISignInState> {
         </button>
 
 
-        <form onSubmit={this._onSignIn} className="form-bordered" noValidate>
+        <form onSubmit={this._onSignIn} className="form-bordered form-sign-in" noValidate>
           <fieldset disabled={!this.props.isSubmitEnabled}>
             <ValidatedInput name="email"
                             addOnClassName="fa fa-fw fa-envelope-o"
@@ -197,14 +166,14 @@ class SignIn extends React.PureComponent<ISignInProps, ISignInState> {
                             required/>
 
             {/*<label className="custom-control custom-checkbox">*/}
-              {/*<input type="checkbox" className="custom-control-input form-input-checkbox"*/}
-                     {/*onChange={this._rememberMeChange}*/}
-                     {/*checked={this.state.rememberMe}/>*/}
-              {/*<span className="custom-control-indicator"/>*/}
-              {/*<span className="custom-control-description">Check this custom checkbox</span>*/}
+            {/*<input type="checkbox" className="custom-control-input form-input-checkbox"*/}
+            {/*onChange={this._rememberMeChange}*/}
+            {/*checked={this.state.rememberMe}/>*/}
+            {/*<span className="custom-control-indicator"/>*/}
+            {/*<span className="custom-control-description">Check this custom checkbox</span>*/}
             {/*</label>*/}
 
-            <div>
+            <div className="sign-in-buttons">
               <button type="submit" className="button confirm">
                 <div className='button-content'>
                   <span>Sign in</span>
@@ -216,9 +185,13 @@ class SignIn extends React.PureComponent<ISignInProps, ISignInState> {
                   }
                 </div>
               </button>
+              {/*<div className="sign-in-buttons-register">*/}
+                <NavLink className="nav-link-button nav-link-secondary" to={ROUTE_REGISTER}>Don't have an account?</NavLink>
+              {/*</div>*/}
             </div>
           </fieldset>
         </form>
+        <NavLink className="nav-link-button nav-link-secondary" to={ROUTE_FORGOT_PASSWORD}>Forgot password?</NavLink>
       </div>
     );
   };
