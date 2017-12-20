@@ -103,7 +103,7 @@ class ForgotPassword extends React.PureComponent<IForgotPasswordProps, IForgotPa
         <form onSubmit={this._onForgotPassword} className="form-bordered form-sign-in" noValidate>
           <fieldset disabled={!this.props.isSubmitEnabled}>
             <ValidatedInput name="email"
-                            addOnClassName="fa fa-fw fa-envelope-o"
+                            addOnClassName="far fa-fw fa-envelope"
                             type="email"
                             placeholder="E-mail"
                             value={this.state.email}
@@ -118,7 +118,7 @@ class ForgotPassword extends React.PureComponent<IForgotPasswordProps, IForgotPa
                 </div>
                 <div className="button-icon confirm">
                   {this.props.isSubmitEnabled
-                    ? <span className="fa fa-fw fa-chevron-right fa-lg"/>
+                    ? <span className="fas fa-fw fa-chevron-right fa-lg"/>
                     : <MDSpinner size={20} className="button-spinner"/>
                   }
                 </div>

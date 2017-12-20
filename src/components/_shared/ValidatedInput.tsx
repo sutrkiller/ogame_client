@@ -33,7 +33,7 @@ interface IValidatedInputState {
 class ValidatedInput extends React.PureComponent<IValidatedInputProps, IValidatedInputState> {
   static displayName = "ValidatedInput";
 
-  _input:HTMLInputElement|null = null;
+  _input: HTMLInputElement | null = null;
 
   _onInputChange = (event: React.FormEvent<HTMLInputElement>) => {
     const value = event.currentTarget.value;
@@ -43,11 +43,18 @@ class ValidatedInput extends React.PureComponent<IValidatedInputProps, IValidate
 
   _renderErrors = () => {
     if (this.props.errors && this.props.errors.size) {
-      return <ul className="form-input-error-list">{this.props.errors.valueSeq().toArray().map((value: IFieldError) => <li key={value.id}>{value.text}</li>)}</ul>
+      return <ul className="form-input-error-list">
+        {
+          this.props.errors.valueSeq().toArray().map((value: IFieldError) =>
+            <li key={value.id}>{value.text}</li>)
+        }
+      </ul>
     }
 
     const defaultMessage = this._input ? this._input.validationMessage : "Invalid input";
-    return <ul className="form-input-error-list"><li key={"default"}>{defaultMessage}</li></ul>
+    return <ul className="form-input-error-list">
+      <li key={"default"}>{defaultMessage}</li>
+    </ul>
   };
 
   render() {

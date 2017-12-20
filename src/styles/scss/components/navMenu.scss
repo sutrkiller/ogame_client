@@ -35,13 +35,8 @@
           background: $menu-hover-background-color;
         }
 
-        .fa {
-          margin-right: 12px;
-          vertical-align: middle;
-          height: 20px;
-        }
-
         .nav-link-text {
+          margin-left: 12px;
           text-overflow: clip;
         }
       }

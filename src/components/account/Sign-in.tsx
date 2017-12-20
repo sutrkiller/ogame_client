@@ -146,7 +146,7 @@ class SignIn extends React.PureComponent<ISignInProps, ISignInState> {
         <form onSubmit={this._onSignIn} className="form-bordered form-sign-in" noValidate>
           <fieldset disabled={!this.props.isSubmitEnabled}>
             <ValidatedInput name="email"
-                            addOnClassName="fa fa-fw fa-envelope-o"
+                            addOnClassName="far fa-fw fa-envelope"
                             type="email"
                             placeholder="E-mail"
                             value={email.value}
@@ -156,7 +156,7 @@ class SignIn extends React.PureComponent<ISignInProps, ISignInState> {
                             required/>
 
             <ValidatedInput name="password"
-                            addOnClassName="fa fa-fw fa-key"
+                            addOnClassName="fas fa-fw fa-key"
                             type="password"
                             placeholder="Password"
                             value={password.value}
@@ -180,7 +180,7 @@ class SignIn extends React.PureComponent<ISignInProps, ISignInState> {
                 </div>
                 <div className="button-icon confirm">
                   {this.props.isSubmitEnabled
-                    ? <span className="fa fa-fw fa-chevron-right fa-lg"/>
+                    ? <span className="fas fa-fw fa-chevron-right fa-lg"/>
                     : <MDSpinner size={20} className={classNames('button-spinner', {'d-none': false})}/>
                   }
                 </div>

@@ -1,28 +1,22 @@
 import * as React from 'react'
-import {IApplicationState, Dispatch} from "../../../store/index";
-import {connect} from "react-redux";
 import {INotificationMessage, NotificationTypeEnum} from "../../../models/INotification";
-import {Guid} from "../../../models/Guid";
-import {actionCreators} from "../../../store/Notifications";
 import * as classNames from 'classnames';
 import Timer = NodeJS.Timer;
 
 interface INotificationMessageOwnProps {
-  notificationId: Guid;
-}
-
-interface INotificationMessageDataProps {
   notification: INotificationMessage;
-}
-
-interface INotificationMessageDispatchProps {
   onRemoveNotification: () => void;
 }
 
-type INotificationMessageProps = INotificationMessageDataProps & INotificationMessageDispatchProps;
+interface INotificationMessageDataProps {
+}
+
+interface INotificationMessageDispatchProps {
+}
+
+type INotificationMessageProps = INotificationMessageDataProps & INotificationMessageDispatchProps & INotificationMessageOwnProps;
 
 interface INotificationMessageState {
-
 }
 
 class NotificationMessage extends React.PureComponent<INotificationMessageProps, INotificationMessageState> {
@@ -63,26 +57,11 @@ class NotificationMessage extends React.PureComponent<INotificationMessageProps,
   render() {
     return (
       <div className={classNames("notification-message", `notification-${this.props.notification ? this.props.notification.type : this._type}`)} role="alert" onClick={this._onClick}>
-        <span className="fa fa-lg fa-exclamation-circle"/>
+        <span className="fas fa-lg fa-exclamation-circle"/>
         <span>{this.props.notification ? this.props.notification.text : this._text}</span>
       </div>
     );
   }
 }
 
-
-const mapStateToProps = (state: IApplicationState, ownProps: INotificationMessageOwnProps): INotificationMessageDataProps => {
-  return {
-    notification: state.notifications.messages.get(ownProps.notificationId)
-  };
-};
-
-const mapDispatchToProps = (dispatch: Dispatch, ownProps: INotificationMessageOwnProps): INotificationMessageDispatchProps => {
-  return {
-    onRemoveNotification: () => dispatch(actionCreators.notificationRemove(ownProps.notificationId))
-  };
-};
-
-const registerContainer = connect(mapStateToProps, mapDispatchToProps)(NotificationMessage);
-
-export {registerContainer as NotificationMessage};
+export {NotificationMessage};

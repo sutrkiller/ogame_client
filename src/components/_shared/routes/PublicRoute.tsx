@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Redirect, Route, RouteProps} from "react-router-dom";
-import {ROUTE_HOME, ROUTE_SIGN_IN} from "../../../config/routes";
+import {ROUTE_HOME} from "../../../config/routes";
 
 export interface IPrivateRouteProps extends RouteProps {
   isAuthenticated: boolean;

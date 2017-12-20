@@ -32,7 +32,7 @@ class Header extends React.PureComponent<IHeaderProps, {}> {
     if (this.props.isAuthenticating) {
       return (
         <div className="content-right-auth">
-          <span className="fa fa-spinner fa-spin fa-lg fa-fw"/>
+          <span className="fas fa-spinner fa-spin fa-lg fa-fw"/>
         </div>
       );
     }
@@ -41,7 +41,7 @@ class Header extends React.PureComponent<IHeaderProps, {}> {
       return (
         <strong className='account-auth-not'>
           <NavLink to={ROUTE_SIGN_IN} className='nav-link' onClick={this.props.onNavigation}>
-            <span className='fa fa-fw fa-user fa-lg'/> <span className="nav-link-account">Register / sign in</span>
+            <span className='fas fa-fw fa-user fa-lg'/> <span className="nav-link-account">Register / sign in</span>
           </NavLink>
         </strong>
       );
@@ -50,14 +50,14 @@ class Header extends React.PureComponent<IHeaderProps, {}> {
     return (
       <div className={classNames('dropdown',{'dropdown-open': this.props.isAccountMenuOpen})}>
         <button ref={element => this.props.setAccountToggleRef(element)} className="dropdown-button" onClick={this.props.onToggleAccountMenu}>
-          <span>My account</span> <span className="fa fa-fw fa-chevron-down"/>
+          <span>My account</span> <span className="fas fa-fw fa-chevron-down"/>
         </button>
         <div ref={element => this.props.setAccountMenuRef(element)} className="dropdown-content">
           <NavLink exact to={ROUTE_SETTINGS} className='nav-link' onClick={this.props.onNavigation}>
-            <span className='fa fa-fw fa-cog fa-lg'/> <span className="nav-link-text">Settings</span>
+            <span className='fas fa-fw fa-cog fa-lg'/> <span className="nav-link-text">Settings</span>
           </NavLink>
           <NavLink exact to={ROUTE_SIGN_OUT} className='nav-link' onClick={this.props.onNavigation}>
-            <span className='fa fa-fw fa-power-off fa-lg'/> <span className="nav-link-text">Sign out</span>
+            <span className='fas fa-fw fa-power-off fa-lg'/> <span className="nav-link-text">Sign out</span>
           </NavLink>
         </div>
       </div>

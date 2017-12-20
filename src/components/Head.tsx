@@ -7,6 +7,7 @@ export class Head extends React.Component<any, any> {
       <Helmet>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <link rel="shortcut icon" href=""/>
+        <link href="https://use.fontawesome.com/releases/v5.0.2/css/all.css" rel="stylesheet"/>
       </Helmet>
     );
   }

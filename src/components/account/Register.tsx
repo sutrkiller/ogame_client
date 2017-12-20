@@ -191,7 +191,7 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
         <form onSubmit={this._onRegister} className="form-bordered" noValidate>
           <fieldset disabled={!this.props.isSubmitEnabled}>
             <ValidatedInput name="email"
-                            addOnClassName="fa fa-fw fa-envelope-o"
+                            addOnClassName="far fa-fw fa-envelope"
                             type="email"
                             placeholder="E-mail"
                             value={email.value}
@@ -201,7 +201,7 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
                             required/>
 
             <ValidatedInput name="userName"
-                            addOnClassName="fa fa-fw fa-user-o"
+                            addOnClassName="far fa-fw fa-user"
                             hintText="Username must be 4-20 characters long."
                             type="text"
                             placeholder="Username"
@@ -212,7 +212,7 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
                             minLength={4} maxLength={20} required/>
 
             <ValidatedInput name="password"
-                            addOnClassName="fa fa-fw fa-key"
+                            addOnClassName="fas fa-fw fa-key"
                             hintText="You password must be 8-20 characters long with 6 unique letters, contain uppercase/lowercase letters and numbers."
                             type="password"
                             placeholder="Password"
@@ -223,7 +223,7 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
                             minLength={8} maxLength={20} required/>
 
             <ValidatedInput name="confirmPassword"
-                            addOnClassName="fa fa-fw fa-key"
+                            addOnClassName="fas fa-fw fa-key"
                             type="password"
                             placeholder="Confirm password"
                             value={confirmPassword.value}
@@ -239,7 +239,7 @@ class Register extends React.PureComponent<IRegisterProps, IRegisterState> {
                 </div>
                 <div className="button-icon confirm">
                   {this.props.isSubmitEnabled
-                    ? <span className="fa fa-fw fa-chevron-right fa-lg"/>
+                    ? <span className="fas fa-fw fa-chevron-right fa-lg"/>
                     : <MDSpinner size={20} className={classNames('button-spinner', {'d-none': false})}/>
                   }
                 </div>

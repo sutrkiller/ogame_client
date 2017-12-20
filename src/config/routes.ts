@@ -13,3 +13,7 @@ export const ROUTE_FORGOT_PASSWORD_SUCCESS = (forgotToken: Guid) => `${ROUTE_FOR
 export const ROUTE_RESET_PASSWORD = '/account/reset-password';
 export const ROUTE_RESET_PASSWORD_SUCCESS = (resetToken: Guid) => `${ROUTE_RESET_PASSWORD}?token=${resetToken}`;
 export const ROUTE_SETTINGS = "/account/settings";
+
+export const ROUTE_RUNNER = "/runner";
+
+

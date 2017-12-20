@@ -189,7 +189,7 @@ class ResetPassword extends React.PureComponent<IResetPasswordProps, IResetPassw
         <form onSubmit={this._onResetPassword} className="form-bordered" noValidate>
           <fieldset disabled={!this.props.isSubmitEnabled}>
             <ValidatedInput name="password"
-                            addOnClassName="fa fa-fw fa-key"
+                            addOnClassName="fas fa-fw fa-key"
                             hintText="You password must be 8-20 characters long with 6 unique letters, contain uppercase/lowercase letters and numbers."
                             type="password"
                             placeholder="Password"
@@ -200,7 +200,7 @@ class ResetPassword extends React.PureComponent<IResetPasswordProps, IResetPassw
                             minLength={8} maxLength={20} required/>
 
             <ValidatedInput name="confirmPassword"
-                            addOnClassName="fa fa-fw fa-key"
+                            addOnClassName="fas fa-fw fa-key"
                             type="password"
                             placeholder="Confirm password"
                             value={confirmPassword.value}
@@ -216,7 +216,7 @@ class ResetPassword extends React.PureComponent<IResetPasswordProps, IResetPassw
                 </div>
                 <div className="button-icon confirm">
                   {this.props.isSubmitEnabled
-                    ? <span className="fa fa-fw fa-chevron-right fa-lg"/>
+                    ? <span className="fas fa-fw fa-chevron-right fa-lg"/>
                     : <MDSpinner size={20} className={classNames('button-spinner', {'d-none': false})}/>
                   }
                 </div>
