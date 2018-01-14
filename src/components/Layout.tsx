@@ -3,7 +3,7 @@ import {NavMenu} from './navigation/NavMenu';
 import {ForgotPassword} from "./account/ForgotPassword";
 import {
   ROUTE_FORGOT_PASSWORD, ROUTE_HOME, ROUTE_REGISTER, ROUTE_REGISTER_CONFIRM,
-  ROUTE_RESET_PASSWORD,
+  ROUTE_RESET_PASSWORD, ROUTE_RUNNER,
   ROUTE_SIGN_IN, ROUTE_SIGN_OUT
 } from "../config/routes";
 import {Route, Switch} from "react-router-dom";
@@ -24,6 +24,8 @@ import {StorageKey_Token} from "../utils/constants";
 import {actionCreators} from "../store/Account";
 import {PrivateRoute} from "./_shared/routes/PrivateRoute";
 import {PublicRoute} from "./_shared/routes/PublicRoute";
+import {RunnerMain} from "./runner/RunnerMain";
+import {setAppElement} from "react-modal";
 
 interface ILayoutOwnProps {
 }
@@ -34,7 +36,7 @@ interface ILayoutDataProps {
 }
 
 interface ILayoutDispatchProps {
-  getAccountDetails: () => void;
+  getAccountDetails: (redirectAddress: string) => void;
 }
 
 type ILayoutRoutedProps = RouteComponentProps<ILayoutDataProps>
@@ -67,7 +69,7 @@ class Layout extends React.Component<ILayoutProps, ILayoutState> {
 
   componentDidMount() {
     if (!this.props.isAuthenticated && localStorage.getItem(StorageKey_Token) !== null) {
-      this.props.getAccountDetails();
+      this.props.getAccountDetails(this.props.location.pathname);
     }
 
     document.addEventListener('mouseup', this._handleClickOutsideMenu);
@@ -152,6 +154,7 @@ class Layout extends React.Component<ILayoutProps, ILayoutState> {
           <Route exact path={ROUTE_HOME} component={Home}/>
           <PublicRoute isAuthenticated={this.props.isAuthenticated} path={ROUTE_SIGN_IN} component={SignIn}/>
           <PrivateRoute isAuthenticated={this.props.isAuthenticated} path={ROUTE_SIGN_OUT} component={SignOut}/>
+          <PrivateRoute isAuthenticated={this.props.isAuthenticated} path={ROUTE_RUNNER} component={RunnerMain}/>
           <Route path={ROUTE_REGISTER_CONFIRM} component={RegisterConfirm}/>
           <PublicRoute isAuthenticated={this.props.isAuthenticated} path={ROUTE_REGISTER} component={Register}/>
           <PublicRoute isAuthenticated={this.props.isAuthenticated} path={ROUTE_FORGOT_PASSWORD} component={ForgotPassword}/>
@@ -173,7 +176,7 @@ const mapStateToProps = (state: IApplicationState): ILayoutDataProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch): ILayoutDispatchProps => {
   return {
-    getAccountDetails: () => {dispatch(actionCreators.getDetails())}
+    getAccountDetails: (redirectAddress: string) => {dispatch(actionCreators.getDetails(redirectAddress))}
   };
 };
 

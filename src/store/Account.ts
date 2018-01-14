@@ -11,6 +11,7 @@ import {OrderedMap} from "immutable";
 import {INotificationMessage, NotificationMessage, NotificationTypeEnum} from "../models/INotification";
 import {guidGenerator} from "../utils/guidGenerator";
 import {GuidEmpty, StorageKey_Token} from "../utils/constants";
+import {ROUTE_HOME} from "../config/routes";
 
 export interface IToken {
   value: Guid;
@@ -79,6 +80,7 @@ export interface IGetDetailsDependencies  extends  IServerRequestDependencies {
   getDetailsStart: () => IAction;
   getDetailsFail: (errors: IParsedErrorResponse) => IAction;
   getDetailsSuccess: (token: IToken, user: IUser) => IAction;
+  redirect: ((redirectAddress: string) => IAction);
 }
 
 export interface IForgotPasswordDependencies  extends  IServerRequestDependencies {
@@ -471,7 +473,7 @@ const forgotPasswordCreator = (dependencies: IForgotPasswordDependencies) => (em
     });
 };
 
-const getDetailsCreator = (dependencies: IGetDetailsDependencies) => (): AppThunkAction<IAction> => (dispatch) => {
+const getDetailsCreator = (dependencies: IGetDetailsDependencies) => (redirectAddress: string): AppThunkAction<IAction> => (dispatch) => {
   dispatch(dependencies.getDetailsStart());
   return client.accountDetails()
     .then(response => {
@@ -480,6 +482,7 @@ const getDetailsCreator = (dependencies: IGetDetailsDependencies) => (): AppThun
         const user = response.data.user as IUser;
         localStorage.setItem(StorageKey_Token, token.value);
         dispatch(dependencies.getDetailsSuccess(token, user));
+        dispatch(dependencies.redirect(redirectAddress || ROUTE_HOME));
       } else {
         localStorage.removeItem(StorageKey_Token);
         const errors = dependencies.parseFailedResponse(response);
@@ -588,6 +591,7 @@ export const actionCreators = {
     getDetailsSuccess,
     getDetailsFail,
     parseFailedResponse,
+    redirect: replace
   }),
   forgotPassword: forgotPasswordCreator({
     forgotPasswordStart,

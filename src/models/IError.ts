@@ -9,6 +9,9 @@ export enum ErrorFieldEnum {
   Username = 'userName',
   Password = 'password',
   ConfirmPassword = 'confirmPassword',
+
+  Name = 'name',
+  Age = 'age'
 }
 
 export const getErrorField = (name: string): ErrorFieldEnum => {
@@ -25,6 +28,12 @@ export const getErrorField = (name: string): ErrorFieldEnum => {
 
     case 'confirmPassword':
       return ErrorFieldEnum.ConfirmPassword;
+
+    case 'name':
+      return ErrorFieldEnum.Name;
+
+    case 'age':
+      return ErrorFieldEnum.Age;
 
     default:
       debugger;

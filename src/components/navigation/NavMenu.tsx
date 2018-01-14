@@ -37,14 +37,16 @@ export class NavMenu extends React.Component<INavMenuProps, INavMenuState> {
               </NavLink>
             </Tooltip>
           </NavItem>
-          <NavItem>
-            <Tooltip placement="right" trigger={['hover']} mouseEnterDelay={0.7} overlay={<span>Runner</span>}
-                     overlayClassName={classNames("nav-tooltip-overlay", {"nav-tooltip-overlay-hidden": this.props.isOpen})}>
-              <NavLink exact to={ROUTE_RUNNER} className='nav-link' onClick={this.props.onNavigation}>
-                <span style={{paddingRight: '4px'}}>{RunnerIcon}</span><span className="nav-link-text">Runner</span>
-              </NavLink>
-            </Tooltip>
-          </NavItem>
+          {!this.props.isAuthenticated ? <noscript/> :
+            <NavItem>
+              <Tooltip placement="right" trigger={['hover']} mouseEnterDelay={0.7} overlay={<span>Runner</span>}
+                       overlayClassName={classNames("nav-tooltip-overlay", {"nav-tooltip-overlay-hidden": this.props.isOpen})}>
+                <NavLink exact to={ROUTE_RUNNER} className='nav-link' onClick={this.props.onNavigation}>
+                  <span style={{paddingRight: '4px'}}>{RunnerIcon}</span><span className="nav-link-text">Runner</span>
+                </NavLink>
+              </Tooltip>
+            </NavItem>
+          }
           <NavItem className={classNames("large-screen-hidden", {"display-none": !this.props.isAuthenticated})}>
             <Tooltip placement="right" trigger={['hover']} mouseEnterDelay={0.7} overlay={<span>Account settings</span>}
                      overlayClassName={classNames("nav-tooltip-overlay", {"nav-tooltip-overlay-hidden": this.props.isOpen})}>

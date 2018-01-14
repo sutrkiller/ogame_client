@@ -68,10 +68,6 @@ class ValidatedInput extends React.PureComponent<IValidatedInputProps, IValidate
       value: this.props.value,
     };
 
-    if (name === 'password') {
-      debugger;
-    }
-
     return (
       <div className="form-group">
         <div className="input-group" aria-describedby={this.props.name + '_help'}>

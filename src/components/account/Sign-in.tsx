@@ -197,7 +197,7 @@ class SignIn extends React.PureComponent<ISignInProps, ISignInState> {
   };
 }
 
-const mapStateToProps = (state: IApplicationState): ISignInDataProps => {
+const mapStateToProps = (state: IApplicationState, ownProps: any): ISignInDataProps => {
   return {
     isSubmitEnabled: !state.account.isLoading,
     errors: state.notifications.validationErrors,
